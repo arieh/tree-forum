@@ -1,20 +1,92 @@
 <?php
 class ForumM extends Model{
+	/**
+	 * @var int default message limit per forum page (root meassages)
+	 * @access private
+	 */
+	private $_default_limit = 10;
 	
-	private $_defLimit = 10;
+	/**
+	 * @var array holder of forum messages
+	 * @access private
+	 */
+	protected $_messages = array();
 	
-	private $_messages = array();
+	/**
+	 * @see <Model.class.php>
+	 */
+	protected $_default_action = 'open';
 	
+	/**
+	 * @see <Model.class.php>
+	 */
+	protected $_actions = array('open','add');
+	
+	
+	protected $_id = 0;
+    /**
+	 * @see <Model.class.php>
+	 */
     public function execute() {
-    	$id    = ($this->getOption('id') || false);
-    	$start = ($this->getOption('start') || 0);
-    	$limit = ($this->getOption('limit') || $this->_defLimit);
-    	
-    	$this->getMessages($id,$start,$limit,true);
-    	$this->orderMessages();
+    	if ($this->checkPermision()==false){
+    		$this->setError('noPermision');
+    		return false;
+    	}
+    	switch ($this->getAction()){
+    		case 'open':
+				$this->openForum();    		
+    		break;
+    		case 'add':
+    			$this->addForum();
+    		break;
+    		default:
+    			throw new FormMException("no valid action was set");
+    		break;
+    	}
     }
     
-    private function getMessages($id,$start,$limit,$log=false){
+  	/**
+  	 * retrives all forum data for this action
+  	 * @access private
+  	 */
+  	private function openForum(){
+  		if (!$this->getOption('id')){
+  			throw new ForumMException('no forum id supplied');
+  		
+  		}else $id = $this->getOption('id');
+  		
+  		if (!$this->forumExists($id,false)){
+  			$this->setError('noForum');
+  			return false;
+  		}
+  		
+		$start = ($this->getOption('start'))? $this->getOption('start') : 0;
+		$limit = ($this->getOption('limit'))? $this->getOption('limit') : $this->_default_limit;
+		    	
+		$this->retrieveMessages($id,$start,$limit,true);
+		$this->orderMessages();
+  	}
+  	
+  	/**
+  	 * checks whether a forum id exists
+  	 * 	@param int $id forum id
+  	 * 	@param bool $log wether to log query or not
+  	 * @access private
+  	 * @return bool
+  	 */
+  	private function forumExists($id,$log=false){
+  		return ($this->_link->countFields('forums',array('id'=>$id),$log)>0);
+  	}
+  	
+    /**
+     * retrieves forum messages
+     * 	@param int $id forum id
+     * 	@param int $start what root message to start from (used for paging)
+     * 	@param int $limit how many root messages to retrieve
+     * 	@param bool $log wether to log query or not
+     * @access private
+     */
+    private function retrieveMessages($id,$start,$limit,$log=false){
     	$query = NewDao::getGenerator();
     	
     	$query->addSelect('messages',array());
@@ -48,7 +120,13 @@ class ForumM extends Model{
 		foreach ($sons  as $msg) $this->_messages[$msg['dna']]=$msg;
     }
     
+    /**
+     * orders the messages retrieved from the database
+     * @access private
+     */
     private function orderMessages(){
+    	if (count($this->_messages)==0) return;
+    	
     	$keys = array_keys($this->_messages);
     	natsort($keys);
     	$messages = $this->_messages;
@@ -60,10 +138,19 @@ class ForumM extends Model{
     	$this->_messages = array_reverse($this->_messages);
     }
     
-    public function getMessage(){
-    	$msg = array_pop($this->_messages);
-    	if ($msg) return new ModelResult($msg);
-    	return false;
+    private function addForum(){
+    	$name = $this->getOption('name');
+    	$desc = $this->getOption('description');
+		if (!$name || strlen($name)<3) $this->setError('name too short:'.$name);
+		if (!$desc || strlen($desc)<3) $this->setError('description too short:'.$desc);
+		if ($this->isError()) return false;
+		
+		$this->createForum($name,$desc,false);    	
+    }
+    
+    private function createForum($name,$desc,$log=false){
+    	$this->_link->insert('forums',array('name'=>$name,'description'=>$desc),$log);
+    	$this->_id = $this->_link->getLastId();
     }
 }
 
