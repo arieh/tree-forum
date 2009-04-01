@@ -21,6 +21,24 @@ class Model{
 	protected $_errors = array();
 	
 	/**
+	 * @param array holds all legal actions for the model
+	 * @access protected
+	 */
+	protected $_actions = array();
+	
+	/**
+	 * @param string holds default action for the model
+	 * @access protected
+	 */
+	protected $_default_action = '';
+	
+	/**
+	 * @param string current model action
+	 * @access protected
+	 */
+	protected $_action = false;
+	
+	/**
 	 * a constructor method for the object. sets the databse holder and the model options
 	 * 	@param array $options paramaters for the model
 	 * 
@@ -33,6 +51,8 @@ class Model{
 		foreach ($options as $name => $value){
 			if (is_string($name)) $this->setOption($name,$value);
 		}
+		
+		$this->setAction();
 	}
 	
 	public function __destruct(){
@@ -59,6 +79,33 @@ class Model{
 	protected function setOption($name,$value){
 		$this->_options[$name] = $value;
 	}
+	
+	/**
+	 * sets the action for the model
+	 * 	@param string $action action name
+	 * @access protected;
+	 */
+	public function setAction($action=false){
+		if ($action && in_array($action,$this->_actions)){
+			$this->_action = $action;
+			return;
+		}
+		if ($action = $this->getOption('action')){
+			if (in_array($action,$this->_actions)) $this->_action = $action;
+			return;
+		}
+		$this->_action = $this->_default_action;
+	}
+	
+	/**
+	 * returns current action
+	 * @access protected
+	 * @return string
+	 */
+	 protected function getAction(){
+	 	if (!$this->_action) return $this->_default_action;
+	 	return $this->_action;
+	 }
 	
 	/**
 	 * sets an internal error
