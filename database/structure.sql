@@ -1,114 +1,75 @@
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
-SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
+/*
+MySQL Data Transfer
+Source Host: 192.168.2.104
+Source Database: tree-forum
+Target Host: 192.168.2.104
+Target Database: tree-forum
+Date: 01/04/2009 17:52:06
+*/
 
+SET FOREIGN_KEY_CHECKS=0;
+-- ----------------------------
+-- Table structure for forums
+-- ----------------------------
+DROP TABLE IF EXISTS `forums`;
+CREATE TABLE `forums` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `description` varchar(255) NOT NULL,
+  `name` varchar(45) NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
--- -----------------------------------------------------
--- Table `forums`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `forums` ;
+-- ----------------------------
+-- Table structure for forums_permisions
+-- ----------------------------
+DROP TABLE IF EXISTS `forums_permisions`;
+CREATE TABLE `forums_permisions` (
+  `add` tinyint(1) NOT NULL default '0',
+  `delete` tinyint(1) NOT NULL default '0',
+  `view` tinyint(1) NOT NULL default '1',
+  `edit` tinyint(1) NOT NULL default '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE  TABLE IF NOT EXISTS `forums` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `description` VARCHAR(255) NOT NULL ,
-  `name` VARCHAR(45) NOT NULL ,
-  PRIMARY KEY (`id`) )
-ENGINE = InnoDB;
+-- ----------------------------
+-- Table structure for message_contents
+-- ----------------------------
+DROP TABLE IF EXISTS `message_contents`;
+CREATE TABLE `message_contents` (
+  `title` varchar(255) default NULL,
+  `message` text,
+  `non-html` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- ----------------------------
+-- Table structure for messages
+-- ----------------------------
+DROP TABLE IF EXISTS `messages`;
+CREATE TABLE `messages` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `dna` varchar(255) collate utf8_bin default NULL,
+  `base` tinyint(1) NOT NULL default '0',
+  `root_id` int(11) default NULL,
+  `forum_id` int(11) default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
--- -----------------------------------------------------
--- Table `messages`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `messages` ;
+-- ----------------------------
+-- Table structure for permisions
+-- ----------------------------
+DROP TABLE IF EXISTS `permisions`;
+CREATE TABLE `permisions` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `name` varchar(45) NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE  TABLE IF NOT EXISTS `messages` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `root_id` INT NOT NULL ,
-  `dna` VARCHAR(255) NOT NULL ,
-  `forum_id` INT NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  CONSTRAINT `fk_message_ids_forums`
-    FOREIGN KEY (`forum_id` )
-    REFERENCES `mydb`.`forums` (`id` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_message_ids_message_ids`
-    FOREIGN KEY (`root_id` )
-    REFERENCES `mydb`.`messages` (`id` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_bin;
-
-CREATE INDEX `fk_message_ids_forums` ON `messages` (`forum_id` ASC) ;
-
-CREATE INDEX `fk_message_ids_message_ids` ON `messages` (`root_id` ASC) ;
-
-
--- -----------------------------------------------------
--- Table `message_contents`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `message_contents` ;
-
-CREATE  TABLE IF NOT EXISTS `message_contents` (
-  `message_id` INT NOT NULL ,
-  `title` VARCHAR(255) NULL ,
-  `message` TEXT NULL ,
-  `non-html` TEXT NULL ,
-  PRIMARY KEY (`message_id`) ,
-  CONSTRAINT `fk_message_contents_message_ids`
-    FOREIGN KEY (`message_id` )
-    REFERENCES `mydb`.`messages` (`id` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-CREATE INDEX `fk_message_contents_message_ids` ON `message_contents` (`message_id` ASC) ;
-
-
--- -----------------------------------------------------
--- Table `permisions`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `permisions` ;
-
-CREATE  TABLE IF NOT EXISTS `permisions` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(45) NOT NULL ,
-  PRIMARY KEY (`id`) )
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `forums_permisions`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `forums_permisions` ;
-
-CREATE  TABLE IF NOT EXISTS `forums_permisions` (
-  `forum_id` INT NOT NULL ,
-  `permision_id` INT NOT NULL ,
-  `add` BOOLEAN NOT NULL DEFAULT false ,
-  `delete` BOOLEAN NOT NULL DEFAULT false ,
-  `view` BOOLEAN NOT NULL DEFAULT true ,
-  `edit` BOOLEAN NOT NULL DEFAULT true ,
-  CONSTRAINT `fk_forums_permisions_forums`
-    FOREIGN KEY (`forum_id` )
-    REFERENCES `mydb`.`forums` (`id` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_forums_permisions_permisions`
-    FOREIGN KEY (`permision_id` )
-    REFERENCES `mydb`.`permisions` (`id` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-CREATE INDEX `fk_forums_permisions_forums` ON `forums_permisions` (`forum_id` ASC) ;
-
-CREATE INDEX `fk_forums_permisions_permisions` ON `forums_permisions` (`permision_id` ASC) ;
-
-
-
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+-- ----------------------------
+-- Records 
+-- ----------------------------
+INSERT INTO `forums` VALUES ('1', 'test forum', 'testing');
+INSERT INTO `messages` VALUES ('1', '1', '1', '1', '1');
+INSERT INTO `messages` VALUES ('2', '1.2', '0', '1', '1');
+INSERT INTO `messages` VALUES ('3', '3', '1', '3', '1');
+INSERT INTO `messages` VALUES ('4', '1.4', '0', '1', '1');
+INSERT INTO `messages` VALUES ('5', '3.5', '0', '3', '1');
+INSERT INTO `messages` VALUES ('6', '1.2.6', '0', '1', '1');

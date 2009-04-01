@@ -3,7 +3,7 @@ define('_SEP_',DIRECTORY_SEPARATOR);
 require_once('autoloader.php');
 require_once('..'._SEP_.'classes'._SEP_.'library'._SEP_.'firePHP'._SEP_.'fb.php');
 try{
-	NewDao::connect('mysql','localhost','root','rjntqvzz','treeForum');
+	NewDao::connect('mysql','localhost','root','pass','tree-forum');
 	NewDao::setLogger('fb');	
 		
 	$options= array('id'=>1,'start'=>0,'limit'=>10);

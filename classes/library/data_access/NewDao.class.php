@@ -191,10 +191,13 @@ class NewDao{
 					$this->_errorFunc = 'mysql_errno';
 					$this->_resultClass = 'DaoMySQLresult';
 					$this->_type = 'mysql';
+					return;
 				break;	
 			}
 		}
-		throw new NewDaoException("The database link is not a valid database link");
+		if (is_resource(self::$_link)) $type = get_resource_type(self::$_link);
+		else $type = gettype(self::$_link);
+		throw new NewDaoException("The database link is not a valid database link:$type");
 	}
 	
 	/**
