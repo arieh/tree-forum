@@ -61,6 +61,36 @@ class Model{
 	}
 	
 	/**
+	 * sets an internal error
+	 * 	@param string $name error name
+	 * @access protected
+	 */
+	protected function setError($name){
+		$this->_errors[$name] = true;
+	}
+	
+	/**
+	 * unsets an internal error
+	 * 	@param string $name erro name to unset
+	 * @access protected
+	 */
+	protected function unsetError($name){
+		if (isset($this->_errors[$name])) unset($this->_errors[$name]);
+	}
+	
+	/**
+	 * checks if an error exists for the model. 
+	 * if no name is specified, checks if any errors were set
+	 * 	@param string $name error name to check
+	 * @access public
+	 * @return bool
+	 */
+	public function isError($name=false){
+		if ($name && isset($this->_errors[$name])) return $this->_errors[$name]; 
+		return (count($this->_errors)>0); 
+	}
+	
+	/**
 	 * returns a JSON representation of the object
 	 * @access public
 	 * @return string
