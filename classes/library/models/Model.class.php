@@ -126,6 +126,12 @@ class Model{
 	}
 	
 	/**
+	 * checks if a specific user has permision to access the page
+	 * @return bool
+	 */
+	protected function checkPermision(){return true;}
+	
+	/**
 	 * checks if an error exists for the model. 
 	 * if no name is specified, checks if any errors were set
 	 * 	@param string $name error name to check
