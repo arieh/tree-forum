@@ -64,5 +64,15 @@ class ModelResult{
 		return count($this->_array);
 	}
 	
+	/**
+	 * pops the first variable of the inner array
+	 * 	@param bool $MdlRslt whether to returns arrays as model results
+	 * @return mixed
+	 */
+	 public function pop($MdlRslt=true){
+	 	$var = array_pop($this->_array);
+	 	return (is_array($var) && $MdlRslt) ? new ModelResult($var) : $var;
+	 }
+	
 	public function __toString(){return json_encode($this);}
 }

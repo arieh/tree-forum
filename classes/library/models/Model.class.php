@@ -152,18 +152,48 @@ class Model{
 	
 	/**
 	 * sets default getters and setters (getParamname(), setParamname())
+	 * 
+	 * properties access by this method must be protected or public. if a property 
+	 * is an array, and it's name is plural, accessing it with singular form will pop its first 
+	 * variable. also, if that variable is an array, it will be passed as a model result.
+	 * 
+	 * for get<ParamName>:
+	 * 	@param bool whether to return arrays as ModelResults
+	 * 
+	 * for set<ParamName>:
+	 * 	if paramater is an array, all passed paramaters will be pushed
 	 */
 	public function __call($name,$args){
 		$action = substr($name,0,3);
-		$var = ".".strtolower(substr($name,3));
-		if (!isset($this->$var) && !property_exists($this,$var)) throw new ModelException("No Method Exists:".$name);
+		$pVar = "_".strtolower(substr($name,3));
+		$sVar = $pVar.'s';
+		$pVarExists = (isset($this->$pVar) || property_exists($this,$pVar));
+		$sVarExists = (
+			(isset($this->$sVar) || property_exists($this,$sVar)) 
+			&& is_array($this->$sVar)
+		);
+		
+		if (!$pVarExists && !$sVarExists) throw new ModelException("No Method Exists:".$name);
+		
 		switch ($action){
 			case 'get':
-				if (is_array($this->$var)) return new modelResult($this->$var);
-				return $this->$var;
+				$mr = (isset($args[0]) && !$args) ? false : true ;
+				if ($sVarExists){
+					
+					$var = array_pop($this->$sVar);
+					if ($var){
+						 return (is_array($var) && $mr)? new ModelResult($var) : $var;
+					}
+					return false;
+				}
+				return (is_array($this->$pVar) && $mr) ? new ModelResult($this->$pVar) : $this->$pVar;
 			break;
 			case 'set':
-				$this->$var = $args[0];
+				if ($sVarExists){
+					foreach ($args as $arg) array_push($this->$sVar,$arg);	
+					return true;
+				}
+				$this->$pVar = $args[0];
 			break;
 		}
 	}
