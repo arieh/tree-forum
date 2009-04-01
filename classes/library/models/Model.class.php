@@ -144,6 +144,14 @@ class Model{
 	}
 	
 	/**
+	 * returns an array of errors
+	 * @access public
+	 * @return array
+	 */
+	public function getErrors(){
+		return array_keys($this->_errors);
+	}
+	/**
 	 * returns a JSON representation of the object
 	 * @access public
 	 * @return string

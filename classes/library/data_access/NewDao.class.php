@@ -384,7 +384,6 @@ class NewDao{
 	public function update($table,$fields,$conditions=array(),$log=false){
 		$sql = $this->generateUpdateSQL($table,$fields,$conditions);
 		$this->query($sql,$log);
-		if ($this->checkLinkErrors($sql)) return false;
 		return true;
 	}
 
@@ -399,7 +398,6 @@ class NewDao{
 	public function insert($table,$fields,$log=false){
 		$sql = $this->generateInsertSQL($table,$fields);
 		$this->query($sql,$log);
-		$this->checkLinkErrors($sql);
 		return;
 	}
 	
