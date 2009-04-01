@@ -282,7 +282,7 @@ class NewDao{
 	 * @return int  
 	 */
 	public function countFields($table,$conditions,$log=false){
-		$query = new mysqlQuery();
+		$query = self::getGenerator();
 		$arr=array();
 		$f = '*';
 		foreach($conditions as $c=>$v){
@@ -306,7 +306,7 @@ class NewDao{
 	 * @return int  
 	 */
 	public function countFieldsLCASE($table,$conditions,$log=false){
-		$query = new mysqlQuery();
+		$query = self::getGenerator();
 		$query->addSelectFunction('COUNT','c',$table);
 		foreach($conditions as $c=>$v){
 			$arr[] = $query->createCondition($table,$c,"=",$v,'LCASE');
@@ -329,7 +329,7 @@ class NewDao{
 	 * @return database result object  
 	 */
 	public function select($table='',$fields=array(),$conditions=array(),$min=true,$log=false){
-		$query = new mysqlQuery();
+		$query = self::getGenerator();
 		$query->addSelect($table,$fields);
 		$arr=array();
 		foreach($conditions as $c=>$v){
