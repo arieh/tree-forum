@@ -4,7 +4,7 @@ Source Host: 192.168.2.104
 Source Database: tree-forum
 Target Host: 192.168.2.104
 Target Database: tree-forum
-Date: 02/04/2009 18:53:08
+Date: 02/04/2009 19:11:35
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -16,7 +16,8 @@ CREATE TABLE `forums` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `description` varchar(255) NOT NULL,
   `name` varchar(45) NOT NULL,
-  PRIMARY KEY  (`id`)
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `message_id` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -27,7 +28,13 @@ CREATE TABLE `forums_permisions` (
   `add` tinyint(1) NOT NULL default '0',
   `delete` tinyint(1) NOT NULL default '0',
   `view` tinyint(1) NOT NULL default '1',
-  `edit` tinyint(1) NOT NULL default '1'
+  `edit` tinyint(1) NOT NULL default '1',
+  `forum_id` int(10) unsigned default NULL,
+  `permision_id` int(10) unsigned default NULL,
+  KEY `forum_id` (`forum_id`),
+  KEY `permision_id` (`permision_id`),
+  CONSTRAINT `forums_permisions_ibfk_2` FOREIGN KEY (`forum_id`) REFERENCES `forums` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `forums_permisions_ibfk_3` FOREIGN KEY (`permision_id`) REFERENCES `permisions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -50,10 +57,15 @@ CREATE TABLE `messages` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `dna` varchar(255) collate utf8_bin default NULL,
   `base` tinyint(1) NOT NULL default '0',
-  `root_id` int(11) default NULL,
-  `forum_id` int(11) default NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+  `root_id` int(10) unsigned default NULL,
+  `forum_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `id` (`id`),
+  KEY `forum_id` (`forum_id`),
+  KEY `root_id` (`root_id`),
+  CONSTRAINT `root_id` FOREIGN KEY (`root_id`) REFERENCES `messages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `forum_id` FOREIGN KEY (`forum_id`) REFERENCES `forums` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Table structure for permisions
@@ -64,27 +76,3 @@ CREATE TABLE `permisions` (
   `name` varchar(45) NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Records 
--- ----------------------------
-INSERT INTO `forums` VALUES ('1', 'test forum', 'testing');
-INSERT INTO `forums` VALUES ('3', 'forum creation test', 'another test');
-INSERT INTO `message_contents` VALUES ('test message', 'this is a <strong>very important</strong> test', 'this is a very important test', '9');
-INSERT INTO `message_contents` VALUES ('test message', 'this is a <strong>very important</strong> test', 'this is a very important test', '10');
-INSERT INTO `message_contents` VALUES ('test message', 'this is a <strong>very important</strong> test', 'this is a very important test', '19');
-INSERT INTO `message_contents` VALUES ('test message', 'this is a <strong>very important</strong> test', 'this is a very important test', '20');
-INSERT INTO `message_contents` VALUES ('test message', 'this is a <strong>very important</strong> test', 'this is a very important test', '21');
-INSERT INTO `message_contents` VALUES ('test message', 'this is a <strong>very important</strong> test', 'this is a very important test', '22');
-INSERT INTO `message_contents` VALUES ('test message', 'this is a <strong>very important</strong> test', 'this is a very important test', '23');
-INSERT INTO `message_contents` VALUES ('test message', 'this is a <strong>very important</strong> test', 'this is a very important test', '24');
-INSERT INTO `message_contents` VALUES ('test message', 'this is a <strong>very important</strong> test', 'this is a very important test', '25');
-INSERT INTO `messages` VALUES ('9', '9', '1', '9', '1');
-INSERT INTO `messages` VALUES ('10', '10', '1', '10', '3');
-INSERT INTO `messages` VALUES ('19', '9.19', '0', '9', '1');
-INSERT INTO `messages` VALUES ('20', '9.19.20', '0', '9', '1');
-INSERT INTO `messages` VALUES ('21', '9.21', '0', '9', '1');
-INSERT INTO `messages` VALUES ('22', '9.22', '0', '9', '1');
-INSERT INTO `messages` VALUES ('23', '9.19.20.23', '0', '9', '1');
-INSERT INTO `messages` VALUES ('24', '9.19.24', '0', '9', '1');
-INSERT INTO `messages` VALUES ('25', '9.19.20.23.25', '0', '9', '1');
