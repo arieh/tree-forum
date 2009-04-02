@@ -1,7 +1,7 @@
 <?php
 require_once('Query.class.php');
 
-class MysqlQuery implements query{
+class MysqlQuery implements Query{
 	/**
 	 * @var array holder of select fields
 	 */
@@ -347,6 +347,7 @@ class MysqlQuery implements query{
 			$sql.=$this->_limit[0];
 			if (isset($this->_limit[1])) $sql.=",".$this->_limit[1];
 		}
+		
 		return $sql;
 	}
 	
