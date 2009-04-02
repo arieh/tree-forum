@@ -12,7 +12,7 @@ try{
 		'message'=>'this is a <strong>very important</strong> test',
 		'forum'=>1,
 		'base'=>false,
-		'parent'=>5
+		'parent'=>9
 	);
 	$message = new MessageM($options);
 	$message->execute();
