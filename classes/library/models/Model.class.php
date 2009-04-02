@@ -81,6 +81,14 @@ class Model{
 	}
 	
 	/**
+	 * checks if a specific option is set (good when an option is expected to be boolean)
+	 * 	@param string $name option name
+	 * @return bool
+	 */
+	protected function optionSet($name){
+		return (isset($this->_options[$name]));
+	}
+	/**
 	 * sets the action for the model
 	 * 	@param string $action action name
 	 * @access protected;
