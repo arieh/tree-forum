@@ -1,4 +1,23 @@
 <?php
+/*
+ * action list:
+ * 
+ * + 'open': open a forum page
+ * 		required: 
+ * 			- id(int) forum id
+ * 		optional: 
+ * 			- start(int) how many root messages to skip
+ * 			- limit(int) how many root messages to pull
+ * 		errors: 'noForum' : forum id is invalid
+ * + 'add': create a forum
+ * 		required:
+ * 			- name (string) forum name. must be longer than 3 chars
+ * 			- description (string) forum description. must be longer than 3 chars
+ * 		errors: 
+ * 			- 'shortName' : forum name is invalid (empty, too short, or not a string)
+ * 			- 'shortDesc' : forum description is invalid (empty, too short, or not a string)
+ */
+
 class ForumM extends Model{
 	/**
 	 * @var int default message limit per forum page (root meassages)
@@ -60,8 +79,11 @@ class ForumM extends Model{
   			return false;
   		}
   		
-		$start = ($this->getOption('start'))? $this->getOption('start') : 0;
-		$limit = ($this->getOption('limit'))? $this->getOption('limit') : $this->_default_limit;
+		$start = $this->getOption('start');
+			if (!$start || !is_numeric($start)) $start = 0;
+		
+		$limit = $this->getOption('limit');
+			if (!$limit || !is_numeric($limit)) $limit = $this->_default_limit;
 		    	
 		$this->retrieveMessages($id,$start,$limit,true);
 		$this->orderMessages();
@@ -138,16 +160,28 @@ class ForumM extends Model{
     	$this->_messages = array_reverse($this->_messages);
     }
     
+    /**
+     * adds a forum
+     * @access private
+     */
     private function addForum(){
     	$name = $this->getOption('name');
     	$desc = $this->getOption('description');
-		if (!$name || strlen($name)<3) $this->setError('name too short:'.$name);
-		if (!$desc || strlen($desc)<3) $this->setError('description too short:'.$desc);
+		
+		if (!$name || strlen($name)<3) $this->setError('shortName');
+		if (!$desc || strlen($desc)<3) $this->setError('shortDesc');
+		
 		if ($this->isError()) return false;
 		
 		$this->createForum($name,$desc,false);    	
     }
     
+    /**
+     * creates a forum
+     * 	@param string $name forum name
+     * 	@param string $desc forum description
+     * @access private
+     */
     private function createForum($name,$desc,$log=false){
     	$this->_link->insert('forums',array('name'=>$name,'description'=>$desc),$log);
     	$this->_id = $this->_link->getLastId();
