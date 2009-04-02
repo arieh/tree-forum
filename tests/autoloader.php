@@ -1,17 +1,20 @@
 <?php
-$GLOBALS['included'] = array();
+
 function __autoload($class_name){
+	TreeForumAutoload($class_name);
+}
+
+/**
+ * searches for a class's file
+ * 	@param string $class_name class name
+ */
+function TreeForumAutoload($class_name){
 	if (!defined(_SEP_)) define('_SEP_',DIRECTORY_SEPARATOR);
-	global $included;
 	if (@file_exists('records.txt'))
 		$record = unserialize(file_get_contents('records.txt'));
 	else
 		$record = array(); 
-	if (!is_array($record)){
-		base::log("bad record:".$class_name);
-		$record = array();
-	} 
-	if (in_array($class_name,$included)) return;
+
 	if (array_key_exists($class_name,$record) && !is_null($record[$class_name])){
 		if (file_exists($record[$class_name]."class.php")){
 			require_once($record[$class_name]."class.php");
@@ -20,16 +23,13 @@ function __autoload($class_name){
 			unset($record[$class_name]);			
 		}
 	}
+	if (!file_exists('folder_list.txt')) return;
 	
-	$folders = array(
-		".."._SEP_."classes"._SEP_."library"._SEP_,
-		".."._SEP_."classes"._SEP_."library"._SEP_."models"._SEP_,
-		".."._SEP_."classes"._SEP_."library"._SEP_."data_access"._SEP_,
-		".."._SEP_."classes"._SEP_."app"._SEP_,
-		".."._SEP_."classes"._SEP_."app"._SEP_."models"._SEP_,
-	);
+	$folders = fopen('folder_list.txt','r');
 	
-	foreach ($folders as $folder){
+	while ($folder = trim(fgets($folders))){
+		if (_SEP_=='/') $folder = str_replace("\\",'/',$folder);
+		else $folder = str_replace('/',"\\",$folder);
 		if (file_exists($folder.$class_name.".class.php")){
 			require_once($folder.$class_name.".class.php");
 			set_record($record,$class_name,$folder.$class_name.".class.php");
