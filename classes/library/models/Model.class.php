@@ -85,7 +85,7 @@ class Model{
 	 * 	@param string $name option name
 	 * @return bool
 	 */
-	protected function optionSet($name){
+	protected function isOptionSet($name){
 		return (isset($this->_options[$name]));
 	}
 	/**
