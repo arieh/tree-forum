@@ -146,7 +146,7 @@ class MessageM extends Model{
 	 * @access private
 	 */
 	private function postSubMessage($forum,$parent,$title,$message,$log=false){
-		$parentIds = $this->getMessageIds($parent,$log);
+		$parentIds = $this->retrieveMessageIds($parent,$log);
 		$this->_link->insert('messages',array('forum_id'=>$forum,'base'=>0),$log);
 		$id = $this->_id = $this->_link->getLastId();
 		
@@ -164,7 +164,7 @@ class MessageM extends Model{
 	 * @access private
 	 * @return array
 	 */
-	private function getMessageIds($id,$log=false){
+	private function retrieveMessageIds($id,$log=false){
 		return $this->_link->select('messages',array('forum_id','root_id','dna','id'),array('id'=>$id),true,$log);
 	}
 	
