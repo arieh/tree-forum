@@ -74,7 +74,7 @@ class ForumM extends Model{
   		
   		}else $id = $this->getOption('id');
   		
-  		if (!$this->forumExists($id,false)){
+  		if (!$this->doesForumExists($id,false)){
   			$this->setError('noForum');
   			return false;
   		}
@@ -96,7 +96,7 @@ class ForumM extends Model{
   	 * @access private
   	 * @return bool
   	 */
-  	private function forumExists($id,$log=false){
+  	private function doesForumExists($id,$log=false){
   		return ($this->_link->countFields('forums',array('id'=>$id),$log)>0);
   	}
   	

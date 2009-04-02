@@ -61,15 +61,15 @@ class MessageM extends Model{
 		//forum id retrival
 			$forum = $this->getOption('forum');
 			if (!$forum) throw new MessageMException('forum id not supplied');
-			if ($this->forumExists($forum)==false) throw new MessageMException('bad forum id:'.$forum);
+			if ($this->doesForumExists($forum)==false) throw new MessageMException('bad forum id:'.$forum);
 		
 		//base validtion
-			$base = ($this->optionSet('base')) ? $this->getOption('base') : true;
+			$base = ($this->isOptionSet('base')) ? $this->getOption('base') : true;
 			if (!$base && !$this->getOption('parent')) throw new MessageMException('parent id must be supplied');
 		
 		//parent validation
 			$parent = $this->getOption('parent');
-			if ($parent && $this->messageExists($parent,$forum)==false) throw new MessageMException('parent is not a valid id in this forum:'.$parent);
+			if ($parent && $this->doesMessageExists($parent,$forum)==false) throw new MessageMException('parent is not a valid id in this forum:'.$parent);
 			
 		//title and message validation
 			$title = $this->getOption('title');
@@ -94,7 +94,7 @@ class MessageM extends Model{
 	 * @access private
 	 * @return bool
 	 */
-	private function forumExists($forum,$log=false){
+	private function doesForumExists($forum,$log=false){
 		return ($this->_link->countFields('forums',array('id'=>$forum),$log)>0);
 	}
 	
@@ -106,7 +106,7 @@ class MessageM extends Model{
 	 * @access private
 	 * @return bool
 	 */
-	private function messageExists($id,$forum,$log=false){
+	private function doesMessageExists($id,$forum,$log=false){
 		return ($this->_link->countFields('messages',array('forum_id'=>$forum,'id'=>$id),$log)>0);
 	}
 	
