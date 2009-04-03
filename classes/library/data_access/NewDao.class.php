@@ -240,21 +240,17 @@ class NewDao{
 		$type = (substr($sql,0,1)=='S') ? 'select' : 'update';
 		
 		if ($log && self::$_logger) call_user_func_array(self::$_logger,$sql);
-		
-		try{
-			switch ($this->_type){
-				case 'mysql':
-					$res = new $class(mysql_query($sql,self::$_link),$type,$sql);
-				break;
-				case 'mysqli':
-					$res = new $class(self::$_link->query($sql),$type,$sql);
-				break;
-			}	
-		}catch (DaoResultException $e){
-			throw new NewDaoException("Query Error:".$e->getMessage());	
-		}catch (Exception $e){
-			throw new NewDaoException("Error:".$e->getMessage());
-		}
+	
+		switch ($this->_type){
+			case 'mysql':
+				$result = mysql_query($sql,self::$_link);
+				if ($err = mysql_error(self::$_link)){
+					throw new NewDaoException("Query Error For Query: $sql\n $err");
+				}
+
+				$res = new $class($result,$type,$sql);
+			break;
+		}	
 		
 		$this->_resultList[] = &$res;
 		return $res;
