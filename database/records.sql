@@ -3,9 +3,9 @@
 -- ----------------------------
 -- Records 
 -- ----------------------------
-INSERT INTO `forum_permisions` VALUES ('1', '0', '1', '1', '1', '1', '1', '1');
-INSERT INTO `forum_permisions` VALUES ('2', '1', '1', '1', '1', '1', '1', '0');
-INSERT INTO `forum_permisions` VALUES ('3', '1', '1', '1', '0', '0', '0', '0');
+INSERT INTO `forum_permisions` VALUES ('1', '0', '1', '1', '1', '1', '1', '1', '1');
+INSERT INTO `forum_permisions` VALUES ('2', '1', '1', '1', '1', '1', '1', '0', '0');
+INSERT INTO `forum_permisions` VALUES ('3', '1', '1', '1', '0', '0', '0', '0', '0');
 INSERT INTO `forums` VALUES ('1', 'test forum', 'testing');
 INSERT INTO `forums` VALUES ('3', 'forum creation test', 'another test');
 INSERT INTO `message_contents` VALUES ('test message', 'this is a <strong>very important</strong> test', 'this is a very important test', '0');
