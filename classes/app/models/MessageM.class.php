@@ -12,7 +12,7 @@
  * 		errors:
  * 			- 'shortTitle' : title is too short or invalid
  * 			- 'shortContent' : content was too short or invalid
- *  + 'open' : open a message, and its chieldren's tree
+ *  + 'view' : open a message, and its chieldren's tree
  * 		required:
  * 			- 'id'(int) : message id
  * 		optional:
@@ -28,13 +28,19 @@ class MessageM extends Model{
 	/**
 	 * @see <Model.class.php>
 	 */
-	protected $_actions = array('open','edit','add','delete');
+	protected $_actions = array('view','edit','add','delete');
 	
 	/**
 	 * @param int message id
 	 * @access protected
 	 */
 	protected $_id = 0;
+	
+	/**
+	 * @param int forum id
+	 * @access protected
+	 */
+	protected $_forum_id = 0;
 	
 	/**
 	 * @param array holder of sub-messages (when opening a message)
@@ -56,6 +62,8 @@ class MessageM extends Model{
 	 * @see <Model.class.php>
 	 */
 	public function execute(){
+		$this->validateInputIds();
+		
 		if ($this->checkPermision()==false){
 			$this->setError('noPermision');
 			return false;
@@ -64,10 +72,33 @@ class MessageM extends Model{
 			case 'add':
 				$this->addMessage();
 			break;
-			case 'open':
+			case 'view':
 				$this->openMessage();
 			break;
 		}
+	}
+	
+	/**
+	 * validates forum id and message id acording to action
+	 * @access private
+	 */
+	private function validateInputIds(){
+		$action = $this->getAction();
+    	
+    	switch ($action){
+    		case 'view':
+    			$id = $this->getId();
+    			if (!$id) $id = $this->getOption('id');
+    			if (!$id || !is_numeric($id)) throw new MessageMException('badId');
+    			if (!$this->doesMessageExists($id)) throw new MessageMException('badId');
+    			
+    			$this->_forum_id = $this->retrieveForumId($id,false);
+    		break;
+    		case 'add':
+    			$forum_id = $this->getOption('forum');
+    			if (!$forum_id || !is_numeric($forum_id)) throw new MessageMException('bad forum id');
+    		break;
+    	}
 	}
 	
 	/**
@@ -79,10 +110,7 @@ class MessageM extends Model{
 		 * Input Validation:
 		 */
 		
-		//forum id retrival
-			$forum = $this->getOption('forum');
-			if (!$forum) throw new MessageMException('forum id not supplied');
-			if ($this->doesForumExists($forum)==false) throw new MessageMException('bad forum id:'.$forum);
+		$forum = $this->getForumId();
 		
 		//base validtion
 			$base = ($this->isOptionSet('base')) ? $this->getOption('base') : true;
@@ -195,11 +223,7 @@ class MessageM extends Model{
 	 * @access private
 	 */
 	private function openMessage(){
-		$id = $this->getOption('id');
-		if (!$id || !is_numeric($id)) throw new MessageMException('badId');
-		
-		if ($this->doesMessageExists($id)==false) throw new MessageMException('badId');
-		
+		$id = $this->getId();
 		$msg = $this->retrieveMessageInfo($id,false);
 		$this->_id = $id;
 		$this->_title = $msg['title'];
@@ -211,7 +235,13 @@ class MessageM extends Model{
 		$this->orderMessages();
 	}
 	
-	
+	/**
+	 * retrieves the message info
+	 * 	@param int $id message id
+	 * 	@param bool $log log queries?
+	 * @access private
+	 * @return array
+	 */
 	private function retrieveMessageInfo($id,$log=false){
 		$query = NewDao::getGenerator();
 		
@@ -227,6 +257,7 @@ class MessageM extends Model{
 		$res = $this->_link->queryArray($query->generate(),$log);
 		return $res[0];
 	}
+	
 	/**
 	 * retrieves the messages
 	 * 	@param string $dna the message's parent list
@@ -266,6 +297,46 @@ class MessageM extends Model{
     		$this->_messages[] = $messages[$key];
     	}
     	$this->_messages = array_reverse($this->_messages);
+    }
+    
+    /**
+     * @see <Model.class.php>
+     */
+    protected function checkPermision(){
+		$action = $this->getAction();
+    	while ($perm = $this->getPermision()){
+    				if ($this->doesHavePermision($action,$perm,true)) return true;
+    			}
+    			$this->setError('noPermision');
+    }
+	
+	/**
+     * checks if a specific permision id is allowed for this specific action
+     * 	@param string $action current action
+     * 	@param int $permision a permision id
+     * 	@param bool logg queries?
+     * @access private
+     * @return bool
+     */
+    private function doesHavePermision($action,$permision,$log=false){
+    	//if this action is forbiden for this permision
+    	if ($this->_link->countFields('forum_permisions',array($action=>0,'forum_id'=>$this->getId()),$log)>0) return false;
+    	
+    	//if this permision is globaly allowed
+    	if ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>0),$log)>0) return true;
+    	
+    	// if this permision is specificly allowed
+    	return ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>$this->getId()),$log)>0);
+    }   
+    private function doesHavePermision($action,$permision,$log=false){
+    	//if this action is forbiden for this permision
+    	if ($this->_link->countFields('forum_permisions',array($action=>0,'forum_id'=>$this->getForumId()),$log)>0) return false;
+    	
+    	//if this permision is globaly allowed
+    	if ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>0),$log)>0) return true;
+    	
+    	// if this permision is specificly allowed
+    	return ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>$this->getForumId()),$log)>0);
     }
 }
 

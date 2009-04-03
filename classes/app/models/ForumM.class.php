@@ -8,11 +8,13 @@
  * 		optional: 
  * 			- start(int) how many root messages to skip
  * 			- limit(int) how many root messages to pull
- * 		errors: 'noForum' : forum id is invalid
- * + 'add': create a forum
+ * 			- persmisions (array) an array of permision ids the user has
+ * + 'create': create a forum
  * 		required:
  * 			- name (string) forum name. must be longer than 3 chars
  * 			- description (string) forum description. must be longer than 3 chars
+ *		optional:
+ *			- persmisions (array) an array of permision ids the user has
  * 		errors: 
  * 			- 'shortName' : forum name is invalid (empty, too short, or not a string)
  * 			- 'shortDesc' : forum description is invalid (empty, too short, or not a string)
@@ -39,10 +41,13 @@ class ForumM extends Model{
 	/**
 	 * @see <Model.class.php>
 	 */
-	protected $_actions = array('open','add');
+	protected $_actions = array('open','create');
 	
-	
-	protected $_id = 0;
+	/**
+	 * @param int forum id
+	 * @access protected
+	 */
+	protected $_id = false;
     /**
 	 * @see <Model.class.php>
 	 */
@@ -55,7 +60,7 @@ class ForumM extends Model{
     		case 'open':
 				$this->openForum();    		
     		break;
-    		case 'add':
+    		case 'create':
     			$this->addForum();
     		break;
     		default:
@@ -69,16 +74,8 @@ class ForumM extends Model{
   	 * @access private
   	 */
   	private function openForum(){
-  		if (!$this->getOption('id')){
-  			throw new ForumMException('no forum id supplied');
-  		
-  		}else $id = $this->getOption('id');
-  		
-  		if (!$this->doesForumExists($id,false)){
-  			$this->setError('noForum');
-  			return false;
-  		}
-  		
+  		$this->validateForumId();
+  		$id = $this->getId();
 		$start = $this->getOption('start');
 			if (!$start || !is_numeric($start)) $start = 0;
 		
@@ -87,6 +84,25 @@ class ForumM extends Model{
 		    	
 		$this->retrieveMessages($id,$start,$limit,true);
 		$this->orderMessages();
+  	}
+  	
+  	/**
+  	 * get the forum id and validates it
+  	 * @access private
+  	 */
+  	private function validateForumId(){
+  		if (is_numeric($this->_id)) return;
+  		
+  		$this->_id =0;
+  		if (!$this->getOption('id')){
+  			throw new ForumMException('no forum id supplied');
+  		
+  		}else $id = $this->getOption('id');
+  		
+  		if (!$this->doesForumExists($id,false)){
+  			throw new ForumMException('no forum id supplied');
+  		}
+  		$this->_id = $id;
   	}
   	
   	/**
@@ -185,6 +201,51 @@ class ForumM extends Model{
     private function createForum($name,$desc,$log=false){
     	$this->_link->insert('forums',array('name'=>$name,'description'=>$desc),$log);
     	$this->_id = $this->_link->getLastId();
+    }
+    
+    /**
+     * @see <Model.class.php>
+     */
+    protected function checkPermision(){
+    	
+    	if ($this->doesHavePermisions()==false){
+    		$this->setError('noPermision');
+    		return false;
+    	}
+    		
+    	$action = $this->getAction();
+    	
+    	if ($action=='open') $this->getForumId();
+    	
+    	if ($this->isError()){
+    		$this->setError('noPermision');
+    		return false;
+    	}
+    	
+    	while ($permision = $this->getPermision()){
+    		if ($this->doesHavePermision($action,$permision,true)) return true;
+    	}
+    	$this->setError('noPermision');
+    	return false;
+    }
+    
+    /**
+     * checks if a specific permision id is allowed for this specific action
+     * 	@param string $action current action
+     * 	@param int $permision a permision id
+     * 	@param bool logg queries?
+     * @access private
+     * @return bool
+     */
+    private function doesHavePermision($action,$permision,$log=false){
+    	//if this action is forbiden for this permision
+    	if ($this->_link->countFields('forum_permisions',array($action=>0,'forum_id'=>$this->getId()),$log)>0) return false;
+    	
+    	//if this permision is globaly allowed
+    	if ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>0),$log)>0) return true;
+    	
+    	// if this permision is specificly allowed
+    	return ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>$this->getId()),$log)>0);
     }
 }
 
