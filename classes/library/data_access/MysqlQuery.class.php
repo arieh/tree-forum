@@ -398,7 +398,9 @@ class MysqlQuery implements Query{
 					//if the value is a normal string, put it inside quotes
 						$sql.="'$arg'";
 					
-					}else $sql.=$arg;
+					}elseif (is_bool($arg)){
+						$sql.= ($arg) ? 1 : 0;
+					}elseif (is_numeric($arg)) $sql.=$arg;
 					
 					$sql.=")";
 					$sep="\n\tAND\n\t";
