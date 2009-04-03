@@ -28,7 +28,7 @@ class MessageM extends Model{
 	/**
 	 * @see <Model.class.php>
 	 */
-	protected $_actions = array('view','edit','add','delete');
+	protected $_actions = array('view','edit','add','remove');
 	
 	/**
 	 * @param int message id
