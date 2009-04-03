@@ -320,16 +320,6 @@ class MessageM extends Model{
      */
     private function doesHavePermision($action,$permision,$log=false){
     	//if this action is forbiden for this permision
-    	if ($this->_link->countFields('forum_permisions',array($action=>0,'forum_id'=>$this->getId()),$log)>0) return false;
-    	
-    	//if this permision is globaly allowed
-    	if ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>0),$log)>0) return true;
-    	
-    	// if this permision is specificly allowed
-    	return ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>$this->getId()),$log)>0);
-    }   
-    private function doesHavePermision($action,$permision,$log=false){
-    	//if this action is forbiden for this permision
     	if ($this->_link->countFields('forum_permisions',array($action=>0,'forum_id'=>$this->getForumId()),$log)>0) return false;
     	
     	//if this permision is globaly allowed
