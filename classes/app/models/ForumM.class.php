@@ -44,10 +44,16 @@ class ForumM extends Model{
 	protected $_actions = array('open','create');
 	
 	/**
+	 * @param array allowed permisions for messages.
+	 * @access private
+	 */
+	 private $_message_actions =  array('view','add'/*,'edit','remove','move'*/);
+	
+	/**
 	 * @param int forum id
 	 * @access protected
 	 */
-	protected $_id = false;
+	protected $_id = 0;
     /**
 	 * @see <Model.class.php>
 	 */
@@ -201,6 +207,10 @@ class ForumM extends Model{
     private function createForum($name,$desc,$log=false){
     	$this->_link->insert('forums',array('name'=>$name,'description'=>$desc),$log);
     	$this->_id = $this->_link->getLastId();
+    	$perms = $this->getOption('forum-permisions');
+    	if (is_array($perms) && count($perms)>0){
+    		$this->addPermisions($perms,true);
+    	}
     }
     
     /**
@@ -246,6 +256,30 @@ class ForumM extends Model{
     	
     	// if this permision is specificly allowed
     	return ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>$this->getId()),$log)>0);
+    }
+    
+    private function addPermisions($pers,$log=false){
+    	foreach ($pers as $per){
+    		$per_id = $per['permision_id'];
+    		if (!$this->doesPermisionExists($per_id,$log)) throw new FormMException("permision $per does not exist");
+    		
+			$fields = array();     		
+    		foreach($per as $name=>$value){
+    			if (
+    				in_array( $name,$this->_message_actions ) 
+    				|| in_array( $name,$this->_actions ) ){
+    					$fields[$name] = $value;	
+    				} 
+    				 
+    		}
+    		$fields['forum_id'] = $this->getId();
+    		$fields['permision_id'] = $per_id;
+    		$this->_link->insert('forum_permisions',$fields,$log); 
+    	}
+    }
+    
+    private function doesPermisionExists($per,$log=false){
+    	return ($this->_link->countFields('permisions',array('id'=>$per),$log)>0);
     }
 }
 
