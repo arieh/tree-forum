@@ -11,10 +11,15 @@ try{
 		'title'=>'test message',
 		'message'=>'this is a <strong>very important</strong> test',
 		'forum'=>1,
-		'base'=>true
+		'base'=>true,
+		'permisions'=>array(1)
 	);
 	$message = new MessageM($options);
 	$message->execute();
+	if ($message->isError()){
+		$errs = $message->getErrors();
+		foreach ($errs as $err) echo "$err<br>";
+	}
 }catch (Exception $e){
 	echo $e->getMessage()." ON ".$e->getLine(). " IN ".$e->getFile();
 }

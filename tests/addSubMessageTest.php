@@ -12,7 +12,8 @@ try{
 		'message'=>'this is a <strong>very important</strong> test',
 		'forum'=>1,
 		'base'=>false,
-		'parent'=>9
+		'parent'=>9,
+		'permisions'=>array(1)
 	);
 	$message = new MessageM($options);
 	$message->execute();

@@ -6,7 +6,12 @@ try{
 	NewDao::connect('mysql','localhost','root','pass','tree-forum');
 	NewDao::setLogger('fb');	
 		
-	$options= array('action'=>'add','name'=>'another test','description'=>'forum creation test');
+	$options= array(
+		'action'=>'add',
+		'name'=>'another test',
+		'description'=>'forum creation test',
+		'permisions'=>array(1)
+	);
 	$forum= new ForumM($options);
 	$forum->execute();
 	if (!$forum->isError())

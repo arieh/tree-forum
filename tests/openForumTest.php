@@ -6,7 +6,7 @@ try{
 	NewDao::connect('mysql','localhost','root','pass','tree-forum');
 	NewDao::setLogger('fb');	
 		
-	$options= array('id'=>1,'start'=>0,'limit'=>10);
+	$options= array('id'=>1,'start'=>0,'limit'=>10,'permisions'=>array());
 	$forum= new ForumM($options);
 	$forum->execute();
 	$prevDepth =0;
