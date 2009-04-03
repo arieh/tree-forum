@@ -245,7 +245,9 @@ class NewDao{
 			case 'mysql':
 				$result = mysql_query($sql,self::$_link);
 				if ($err = mysql_error(self::$_link)){
-					throw new NewDaoException("Query Error For Query: $sql\n $err");
+					$error = "Error from DB: $err";
+					if ($sql) $error.="\n( $sql )";
+					throw new NewDaoException($error);
 				}
 
 				$res = new $class($result,$type,$sql);
