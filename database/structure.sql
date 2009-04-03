@@ -4,10 +4,27 @@ Source Host: 192.168.2.104
 Source Database: tree-forum
 Target Host: 192.168.2.104
 Target Database: tree-forum
-Date: 02/04/2009 19:11:35
+Date: 03/04/2009 11:48:28
 */
 
 SET FOREIGN_KEY_CHECKS=0;
+-- ----------------------------
+-- Table structure for forum_permisions
+-- ----------------------------
+DROP TABLE IF EXISTS `forum_permisions`;
+CREATE TABLE `forum_permisions` (
+  `permision_id` int(10) unsigned default NULL,
+  `forum_id` int(10) unsigned NOT NULL,
+  `open` tinyint(1) NOT NULL default '0',
+  `add` tinyint(1) NOT NULL default '0',
+  `delete` tinyint(1) NOT NULL default '0',
+  `view` tinyint(1) NOT NULL default '0',
+  `edit` tinyint(1) NOT NULL default '0',
+  `create` tinyint(1) NOT NULL default '0',
+  KEY `permision_id` (`permision_id`),
+  CONSTRAINT `forum_permisions_ibfk_3` FOREIGN KEY (`permision_id`) REFERENCES `permisions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- ----------------------------
 -- Table structure for forums
 -- ----------------------------
@@ -18,24 +35,7 @@ CREATE TABLE `forums` (
   `name` varchar(45) NOT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `message_id` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Table structure for forums_permisions
--- ----------------------------
-DROP TABLE IF EXISTS `forums_permisions`;
-CREATE TABLE `forums_permisions` (
-  `add` tinyint(1) NOT NULL default '0',
-  `delete` tinyint(1) NOT NULL default '0',
-  `view` tinyint(1) NOT NULL default '1',
-  `edit` tinyint(1) NOT NULL default '1',
-  `forum_id` int(10) unsigned default NULL,
-  `permision_id` int(10) unsigned default NULL,
-  KEY `forum_id` (`forum_id`),
-  KEY `permision_id` (`permision_id`),
-  CONSTRAINT `forums_permisions_ibfk_2` FOREIGN KEY (`forum_id`) REFERENCES `forums` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `forums_permisions_ibfk_3` FOREIGN KEY (`permision_id`) REFERENCES `permisions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for message_contents
@@ -75,4 +75,4 @@ CREATE TABLE `permisions` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `name` varchar(45) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
