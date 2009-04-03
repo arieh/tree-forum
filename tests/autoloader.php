@@ -9,7 +9,7 @@ function __autoload($class_name){
  * 	@param string $class_name class name
  */
 function TreeForumAutoload($class_name){
-	if (!defined(_SEP_)) define('_SEP_',DIRECTORY_SEPARATOR);
+	if (!defined('_SEP_')) define('_SEP_',DIRECTORY_SEPARATOR);
 	if (@file_exists('records.txt'))
 		$record = unserialize(file_get_contents('records.txt'));
 	else
