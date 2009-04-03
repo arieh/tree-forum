@@ -439,9 +439,13 @@ class NewDao{
 				
 				for ($i=0;$i<count($vals);$i++){
 					if (in_array($vals[$i],$funcs)) $sur='';
-					elseif (is_string($vals[$i])) $sur="'";
+					elseif (is_numeric($vals[$i])==false && is_bool($vals[$i])==false) $sur="'";
 					else $sur="";
-					$sql.=$sep.$sur.$vals[$i].$sur;
+					
+					if (is_bool($vals[$i])) $value = ($vals[$i]) ? 1 : 0;
+					else $value = $vals[$i];
+					
+					$sql.=$sep.$sur.$value.$sur;
 					$sep=",";
 				}	
 						
@@ -460,15 +464,18 @@ class NewDao{
 				$sep="";
 				$sur = '';
 				foreach ($fields as $key=>$value){
-					$sur = (is_numeric($value))? '' : "'";
+					$sur = (is_numeric($value) || is_bool($value))? '' : "'";
+					if (is_bool($value)) $value = ($value) ? 1 : 0;
 					$sql.=$sep."`$key`=".$sur.$value.$sur;
-					$sep = ',';
+ 					$sep = ',';
 				}		
 				if (count($conditions)==0) return $sql;
 				$sql.=" WHERE ";
 				$sep = '';
 				foreach ($conditions as $field => $value){
-					$sur = (is_numeric($value)) ? '' : "'";
+					$sur = (is_numeric($value) || is_bool($value)) ? '' : "'";
+					if (is_bool($value)) $value = ($value) ? 1 : 0;
+					
 					$sql.= "$sep `$field` = $sur".$value.$sur;
 					$sep = " AND ";
 				}
