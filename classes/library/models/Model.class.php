@@ -225,7 +225,8 @@ class Model{
 	 */
 	public function __call($name,$args){
 		$action = substr($name,0,3);
-		$pVar = "_".strtolower(substr($name,3));
+		$pVar = misc::explodeCase(substr($name,3));
+		$pVar = "_".implode("_",$pVar);
 		$sVar = $pVar.'s';
 		$pVarExists = (isset($this->$pVar) || property_exists($this,$pVar));
 		$sVarExists = (
