@@ -148,10 +148,12 @@ class NewDao{
 	 * a factory for an appropriate Query generator
 	 * @access public
 	 * @static
-	 * @return Query a query class relevant for the database type
+	 * @return Query a query class relevant for the database type. if not connected, assumes MysqlQuery
+	 * 
+	 * @comment note: if now connected, query will not escape string!
 	 */
 	static public function getGenerator(){
-		if (self::connected()==false) throw new NewDaoException('not connected');
+		if (self::connected()==false) return new MysqlQuery(); 
 		
 		switch (self::getInstance()->getType()){
 			case 'mysql':

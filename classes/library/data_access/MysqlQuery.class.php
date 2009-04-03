@@ -139,7 +139,10 @@ class MysqlQuery implements Query{
 		};
 		
 		if ($argument instanceof query) $cond['argument'] = $argument;
-		elseif (is_numeric($argument)===false && is_string($argument)) $cond['argument'] = mysql_real_escape_string($argument);	
+		elseif (is_numeric($argument)===false 
+				&& is_string($argument)
+				&& NewDao::connected()
+				) $cond['argument'] = mysql_real_escape_string($argument);	
 		else $cond['argument'] = $argument;	
 		
 		$cond['fields'] = array($table,$field);
