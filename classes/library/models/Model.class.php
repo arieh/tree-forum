@@ -1,6 +1,11 @@
 <?php
 class ModelException extends Exception{}
 
+/*
+ * paramaters:
+ * 	- permisions (array) a list of permisions ids the current user has
+ * 	- actions (string)   current action
+ */
 class Model{
 	/**
 	 * @var NewDao a database handler object
@@ -38,6 +43,8 @@ class Model{
 	 */
 	protected $_action = false;
 	
+	protected $_permisions = array();
+	
 	/**
 	 * a constructor method for the object. sets the databse holder and the model options
 	 * 	@param array $options paramaters for the model
@@ -51,7 +58,10 @@ class Model{
 		foreach ($options as $name => $value){
 			if (is_string($name)) $this->setOption($name,$value);
 		}
-		
+		if ($this->isOptionSet('permisions')){
+			$this->_permisions = $this->getOption('permisions');
+			$this->setOption('permisions',null);
+		} 
 		$this->setAction();
 	}
 	
@@ -114,6 +124,33 @@ class Model{
 	 	if (!$this->_action) return $this->_default_action;
 	 	return $this->_action;
 	 }
+	 
+	 /**
+	  * get a permision from the permision list
+	  * @return int permision id
+	  * @access protected
+	  */
+	 protected function getPermision(){
+	 	return array_pop($this->_permisions);
+	 }
+	 
+	 /**
+	  * gets permision list
+	  * @access protected
+	  * @return array
+	  */
+	 protected function getPermisions(){
+	 	return $this->_permisions;
+	 }
+	 
+	 /**
+	  * checks if any permisions were set
+	  *	@access protected
+	  *	@return bool
+	  */
+	 protected function doesHavePermisions(){
+	 	return (count($this->_permisions)>0);
+	 }
 	
 	/**
 	 * sets an internal error
@@ -159,6 +196,7 @@ class Model{
 	public function getErrors(){
 		return array_keys($this->_errors);
 	}
+	
 	/**
 	 * returns a JSON representation of the object
 	 * @access public
