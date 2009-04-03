@@ -161,13 +161,12 @@ class MysqlQuery implements Query{
 		$arr = array();
 		foreach ($conds as $cond){
 			if (is_array($cond)){
+				$sub_arr = array();
 				foreach ($cond as $c){
-					if ($c instanceof subCondition){
-						$arr[]=$c;
-					}
+					if ($c instanceof subCondition) $sub_arr[] = $c;
 				}	
-			}
-			if ($cond instanceof subCondition){
+				if (count($c)>0) $this->_conditionSets[]=$sub_arr;
+			}else if ($cond instanceof subCondition){
 				$arr[]=$cond;
 			}
 		}
