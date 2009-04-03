@@ -132,7 +132,7 @@ class ForumM extends Model{
 		$query->resetConditions();
 		
 		$query->addConditionSet(
-			$query->createCondition('messages','root_id','IN','('.implode(',',$ids).')'),
+			$query->createCondition('messages','root_id','IN',$ids),
 			$query->createCondition('messages','base','!=','1')
 		);    	
 		
