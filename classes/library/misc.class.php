@@ -102,7 +102,7 @@ class misc {
 	  
 	  // Convert all the array elements to lowercase if desired
 	  if ($lower) {
-	    $array = array_map(strtolower, $array);
+	    $array = array_map('strtolower', $array);
 	  }
 	  
 	  // Return the resulting array
