@@ -8,11 +8,24 @@ try{
 	NewDao::setLogger('fb');	
 		
 	$options= array(
-		'action'=>'add',
-		'name'=>'another test',
-		'description'=>'forum creation test',
-		'permisions'=>array(1)
+		'action'=>'create',
+		'name'=>'random forum',
+		'description'=>'a forum with a permision',
+		'permisions'=>array(1),
+		'forum-permisions'=>array(
+			array(			
+				'permision_id'=>4,
+				'open'=>1,
+				'add'=>1,
+				'view'=>1
+			),
+			array(
+				'permision_id'=>5,
+				'open'=>1
+			)
+		)
 	);
+	
 	$forum= new ForumM($options);
 	$forum->execute();
 	if (!$forum->isError())
