@@ -155,7 +155,7 @@ class MysqlQuery implements Query{
 	 * 
 	 * each condition set is joined with AND, and seperated from other sets with OR
 	 * 
-	 * @param subCondition|array any number of condition objects and arrays of conditions 
+	 * @param subCondition|array any number of condition objects and arrays of conditions (arrays will be handled as separate condition sets)
 	 * 
 	 * @access public 
 	 */

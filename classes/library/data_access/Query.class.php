@@ -42,7 +42,7 @@ interface Query{
 	 * @param string       $table    table name
 	 * @param string       $field    field name
 	 * @param string       $action   what comparison method to use
-	 * @param string       $argument what to compare with
+	 * @param mixed        $argument what to compare with. can be: int, string, array (for IN statements) and Query instance (for sub-queries)
 	 * @param string|array $function a function name|an array of function name and paramters for the function
 	 * 
 	 * @access public
@@ -55,7 +55,7 @@ interface Query{
 	 * 
 	 * each condition set is joined with AND, and seperated from other sets with OR
 	 * 
-	 * @param condition any number of condition objects
+	 * @param subCondition|array any number of condition objects and arrays of conditions (arrays will be handled as separate condition sets)
 	 * 
 	 * @access public 
 	 */
