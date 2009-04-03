@@ -139,7 +139,7 @@ class MysqlQuery implements Query{
 		};
 		
 		if ($argument instanceof query) $cond['argument'] = $argument;
-		elseif (is_numeric($argument)===false) $cond['argument'] = mysql_real_escape_string($argument);	
+		elseif (is_numeric($argument)===false && is_string($argument)) $cond['argument'] = mysql_real_escape_string($argument);	
 		else $cond['argument'] = $argument;	
 		
 		$cond['fields'] = array($table,$field);
@@ -243,36 +243,72 @@ class MysqlQuery implements Query{
 	 * @return string an SQL statment
 	 */
 	public function generate(){
-		$sql ='';
-		$tables = array();
-		$sql = "\nSELECT \n";
-		$sep = '';
+		$sql =''; //query string
+		
+		$tables = array(); //holds a list of tables
+		
+		$sql = "\nSELECT \n"; //start select statement
+		
+		$sep = ''; //holds the separator between fields (commas in this case)
+		
+		/*
+		 * =============================
+		 *  generate Select Statements:
+		 * =============================
+		 */
 		foreach ($this->_selects as $table=>$fields){
-			$tables[]=$table;
+		//go through all tabels in select list
+			$tables[]=$table; //push the table into table list
 			if (count($fields)==0){
+			//if no fields were set, select all
 				$sql.=$sep."\t"."`$table`.*";
 				$sep=',';
 			}else{
+			//if fields were set:	
 				foreach ($fields as $fn=>$alias){
+				//go through field list	
 					if (is_numeric($fn)==false){
+					//if an alias was set:	
 						$sql.=$sep."\t"."`$table`.`$fn` as `$alias`";
 					}elseif ($alias==='*'){
+					// if a select all statment was set:	
 						$sql.=$sep."\t"."`$table`.*";
 					}else{
+					// select the field without an alias	
 						$sql.=$sep."\t"."`$table`.`$alias`";
 					}
 					$sep=",\n";
 				}
 			}
 		}
+		
+		
+		/*
+		 * =============================================
+		 *  generate select statements using functions:
+		 * =============================================
+		 */
+		 
 		foreach ($this->_selectFuncs as $select){
+		// go through select-with-function list	
 			if (strlen($select[0][1])>0){
+			//if any arguments were set to be sent with the function:
 				$args = ",".$select[0][1];
-			}else $args='';
+			}else //if none were set: 
+				$args='';
+			
+			//if an alias was set use it
 			$alias = (strlen($select[1])>0) ? " as `".$select[1]."` " : '';
+			
+			//check if a table was set for the function
 			$table = ($select[2] && strlen($select[2])>0) ? "`".$select[2]."`" : '';
+			
+			//if a table was set, push it into table list:
 			if ($table) $tables[]=$select[2];
+			
+			
 			if ($select[3] && strlen($select[3])>0){
+			//if a field was set :
 				$field ="`".$select[3]."`"; 
 				$tSep = ".";
 			}else{
@@ -281,46 +317,100 @@ class MysqlQuery implements Query{
 				$field = '*';
 			}
 			
+			//glue all paramaters into a select statement:
 			$sql.=$sep."\t".$select[0][0]."($table $tSep $field $args) $alias";
 			$sep = ",\n";
 		}
 		
+		/*
+		 * ==========================
+		 *  generate from statement
+		 * ==========================
+		 */
 		$sql.="\nFROM `".$tables[0]."`\n";
 		
-		if (count($this->_innerJoins)>0){
+		/*
+		 * =================================
+		 *  generate inner-joins statements
+		 * =================================
+		 */
+		if (count($this->_innerJoins)>0){ //if any joins were set:	
 			foreach ($this->_innerJoins as $tables){
-				$mTable = $tables[0];
-				$keys = array_keys($mTable);
+			//go through inner join list:
+				//get the main table`s name:
+				$mTable = $tables[0]; //get the main table
+				$keys = array_keys($mTable); 
 				$mtname =  $keys[0];
-				$sTable = $tables[1];
+				 
+				//get the seconderies table name:
+				$sTable = $tables[1]; //get the secondary table
 				$keys = array_keys($sTable);
 				$stname =  $keys[0];
+				
+				//glue them together
 				$sql.="\tInner Join `".$stname."` ON `".$mtname."`.`".$mTable[$mtname]."` = `".$stname."`.`".$sTable[$stname]."`\n";
 			}
 		}
 		
+		/*
+		 * ============================
+		 * 	   setting conditions:
+		 * ============================
+		 */
 		if (count($this->_conditionSets)>0){
 			$sql.="WHERE \n";
 			$sep="\t";
 			foreach($this->_conditionSets as $condset){
+			// for each AND clusture	
 				foreach($condset as $cond){
-					$field = $cond->getFields();
-					if ($func = $cond->getFunc()){
-						$args = (strlen($func[1])>0) ? ",".$func[1] : '';
-						$sql.=$sep."(".$func[0]."(`".$field[0]."`.`".$field[1]."`$args) ";
+				//foreach condition	
+					$field = $cond->getFields();// retrieve field name
+					if ($func = $cond->getFunc()){ 
+					// if a function was set for this condition:
+						$args = (strlen($func[1])>0) ? ",".$func[1] : '';//if argument were set
+						$sql.=$sep."(".$func[0]."(`".$field[0]."`.`".$field[1]."`$args) "; //glue function
 					}else{
+					//if no function was set, gule field name:	
 						$sql.=$sep."(`".$field[0]."`.`".$field[1]."` ";
 					}
 					$sql.= $cond->getAction()." ";
 					$arg = $cond->getArgument();
+
+					// if argument is a subquery:
 					if ($arg instanceof query) $sql.="(".$arg->generate()."))";
-					elseif (!is_numeric($arg) && $cond->getAction()!='IN') $sql.="'$arg')";
-					else $sql.=$arg.")";
+					
+					if ($cond->getAction() == 'IN' and is_array($arg)){
+					//if the condition is an in statement, expect an array of arguments:
+						$sql.='(';
+						$in_sep = '';
+						foreach ($arg as $a){
+							if (is_numeric($a)) $sql.="$in_sep'$a'";
+							else $sql.=$in_sep.$a;
+							$in_sep=',';
+						}
+						$sql.=')';
+					}elseif ($cond->getAction()=='IN' && is_string($arg)){
+					// if argument is an array, assume its a valid IN value	
+						$sql .="($arg)";
+					}elseif (!is_numeric($arg) && is_string($arg)){ 
+					//if the value is a normal string, put it inside quotes
+						$sql.="'$arg'";
+					
+					}else $sql.=$arg;
+					
+					$sql.=")";
 					$sep="\n\tAND\n\t";
 				}
 				$sep="\n OR \n\t";
 			}
 		}
+		
+		/*
+		 * ====================
+		 *  group by statement
+		 * ====================
+		 */
+		
 		if (count($this->_group)>0){
 			$sql.="\nGROUP BY ";
 			$sep = "";
@@ -331,6 +421,11 @@ class MysqlQuery implements Query{
 			}
 		}
 		
+		/*
+		 * ======================
+		 * 	order by statement
+		 * ======================
+		 */
 		if (count($this->_order)>0){
 			$sql.="\nORDER BY ";
 			$sep = "";
@@ -342,6 +437,11 @@ class MysqlQuery implements Query{
 			$sql.=($this->_orderDesc) ? " DESC" : " ASC";
 		}
 		
+		/*
+		 * ===================
+		 * 	limit statement
+		 * ===================
+		 */
 		if (count($this->_limit)>0){
 			$sql.="\nLIMIT ";
 			$sql.=$this->_limit[0];
