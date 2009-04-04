@@ -8,13 +8,14 @@
  * 		optional: 
  * 			- start(int) how many root messages to skip
  * 			- limit(int) how many root messages to pull
- * 			- persmisions (array) an array of permision ids the user has
  * + 'create': create a forum
  * 		required:
  * 			- name (string) forum name. must be longer than 3 chars
  * 			- description (string) forum description. must be longer than 3 chars
  *		optional:
- *			- persmisions (array) an array of permision ids the user has
+ *			- forum-permisions (array) an array of associative arrays of the following structure:
+ *				* permision_id (int) a permision's id
+ *				* a list of action as 'action-name' => 1/0
  * 		errors: 
  * 			- 'shortName' : forum name is invalid (empty, too short, or not a string)
  * 			- 'shortDesc' : forum description is invalid (empty, too short, or not a string)
@@ -258,6 +259,12 @@ class ForumM extends Model{
     	return ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>$this->getId()),$log)>0);
     }
     
+    /**
+     * adds permisions to the forum
+     * 	@param array $pers an array of permision arrays
+     * 	@param bool $log log queries?
+     * @access private
+     */
     private function addPermisions($pers,$log=false){
     	foreach ($pers as $per){
     		$per_id = $per['permision_id'];
@@ -278,6 +285,13 @@ class ForumM extends Model{
     	}
     }
     
+    /**
+     * checks if a specific permision exists
+     * 	@param int $per permision id
+     * 	@param bool $log log queries?
+     * @access private
+	 * @return bool
+     */
     private function doesPermisionExists($per,$log=false){
     	return ($this->_link->countFields('permisions',array('id'=>$per),$log)>0);
     }
