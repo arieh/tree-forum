@@ -24,12 +24,14 @@
  * 		errors:
  * 			- 'shortContent' : invalid content 
  * + 'move' : moves a message from one tree to another
- * 		requiered:
+ * 		requierd:
  * 			- id (int) : message id
  * 		optional:
  * 			- new-parent (id) : new parent's id. requierd if not base
  * 			- base (bool) : whether to make the message a root message
- * 		
+ * + 'remove' : removes a message and its siblings from the database
+ * 		requierd:
+ * 			-id (int) : message id 		
  */ 
 class MessageM extends Model{
 	/**
@@ -40,7 +42,7 @@ class MessageM extends Model{
 	/**
 	 * @see <Model.class.php>
 	 */
-	protected $_actions = array('view','add','edit','move'/*,'remove'*/);
+	protected $_actions = array('view','add','edit','move','remove');
 	
 	/**
 	 * @param int message id
@@ -122,6 +124,9 @@ class MessageM extends Model{
 			break;
 			case 'move':
 				$this->moveMessage();
+			break;
+			case 'remove':
+				$this->removeMessage();
 			break;
 		}
 	}
@@ -435,6 +440,12 @@ class MessageM extends Model{
     	return $res['dna'];
     }
     
+    /**
+     * returns the root_id of a message
+     * 	@param int $id message id
+     * 	@param bool $log log queries?
+     * @access private
+     */
     private function retrieveRoot($id,$log=false){
     	$res = $this->_link->select('messages',array('root_id'),array('id'=>$id),true,$log);
     	return $res['root_id'];
@@ -459,7 +470,22 @@ class MessageM extends Model{
 		return $this->_link->queryArray($query->generate(),$log);
     }
     
-    
+    /**
+     * removes a message and its siblings form the database
+     * @access private
+     */
+    private function removeMessage(){
+    	$id = $this->getId();
+    	$dbug = $this->isDebug();
+    	$dna = $this->retrieveDna($id,$dbug);
+    	
+    	$children = $this->retrieveChildrenIds($dna,$dbug);
+    	
+    	foreach ($children as $child){
+    		$this->_link->delete('messages',array('id'=>$child['id']),$dbug);
+    	}
+    	$this->_link->delete('messages',array('id'=>$id),$dbug);
+    }
 }
 
 class MessageMException extends ModelException{}
