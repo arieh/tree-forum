@@ -21,7 +21,7 @@
  * 			- 'shortDesc' : forum description is invalid (empty, too short, or not a string)
  */
 
-class ForumM extends Model{
+class ForumM extends TFModel{
 	/**
 	 * @var int default message limit per forum page (root meassages)
 	 * @access private
@@ -301,5 +301,5 @@ class ForumM extends Model{
     }
 }
 
-class ForumMException extends ModelException{}
+class ForumMException extends TFModelException{}
 ?>

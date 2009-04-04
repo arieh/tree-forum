@@ -1,12 +1,12 @@
 <?php
-class ModelException extends Exception{}
+class TFModelException extends Exception{}
 
 /*
  * paramaters:
  * 	- permisions (array) a list of permisions ids the current user has
  * 	- actions (string)   current action
  */
-class Model{
+class TFModel{
 	/**
 	 * @var NewDao a database handler object
 	 * @access protected

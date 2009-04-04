@@ -33,7 +33,7 @@
  * 		requierd:
  * 			-id (int) : message id 		
  */ 
-class MessageM extends Model{
+class MessageM extends TFModel{
 	/**
 	 * @see <Model.class.php>
 	 */
@@ -488,4 +488,4 @@ class MessageM extends Model{
     }
 }
 
-class MessageMException extends ModelException{}
+class MessageMException extends TFModelException{}
