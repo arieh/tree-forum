@@ -9,6 +9,7 @@
  * 			- 'parent' (int)     : the parent message. only required if not a base message
  * 		optional:
  * 			- 'base'(bool) : whether this is a base message or not (defualt: true)
+ * 			- 'user'(int)  : a user id
  * 		errors:
  * 			- 'shortTitle' : title is too short or invalid
  * 			- 'shortContent' : content was too short or invalid
@@ -194,6 +195,7 @@ class MessageM extends TFModel{
 		//title and message validation
 			$title = $this->getOption('title');
 			$message = $this->getOption('message');
+			$user = $this->getOption('user');
 			
 			if (!$title || !is_string($title) || strlen($title)<2) $this->setError('shortTitle');
 			if (!$message || !is_string($message) || strlen($message)<2) $this->setError('shortContent');
@@ -203,8 +205,8 @@ class MessageM extends TFModel{
 		/*
 		 * post message
 		 */
-		if ($base) $this->postBaseMessage($forum,$title,$message,$this->isDebug());
-		else $this->postSubMessage($forum,$parent,$title,$message,$this->isDebug());
+		if ($base) $this->postBaseMessage($forum,$title,$message,$user,$this->isDebug());
+		else $this->postSubMessage($forum,$parent,$title,$message,$user,$this->isDebug());
 	}
 	
 	/**
@@ -239,14 +241,15 @@ class MessageM extends TFModel{
 	 * 	@param bool   $log log queries?
 	 * @access private
 	 */
-	private function postBaseMessage($forum,$title,$message,$log=false){
+	private function postBaseMessage($forum,$title,$message,$user=0,$log=false){
 		$this->_link->insert(
 			'messages',
 			array(
 				'forum_id'=>$forum,
 				'base'=>1,
 				'posted'=>'NOW()',
-				'last_update'=>'NOW()'
+				'last_update'=>'NOW()',
+				'user_id'=>$user
 				),
 			$log
 		);
@@ -275,7 +278,7 @@ class MessageM extends TFModel{
 	 * 	@param bool   $log log queries?
 	 * @access private
 	 */
-	private function postSubMessage($forum,$parent,$title,$message,$log=false){
+	private function postSubMessage($forum,$parent,$title,$message,$user=0,$log=false){
 		$parentIds = $this->retrieveMessageIds($parent,$log);
 		$this->_link->insert(
 			'messages',
@@ -283,7 +286,8 @@ class MessageM extends TFModel{
 				'forum_id'=>$forum,
 				'base'=>0,
 				'posted'=>'NOW()',
-				'last_update'=>'NOW()'
+				'last_update'=>'NOW()',
+				'user_id'=>0
 				),
 				$log
 			);

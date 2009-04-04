@@ -15,7 +15,8 @@ try{
 		'base'=>false,
 		'parent'=>34,
 		'permisions'=>array(1),
-		'debug'=>true
+		'debug'=>true,
+		'user'=>3
 	);
 	$message = new MessageM($options);
 	$message->execute();

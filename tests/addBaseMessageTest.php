@@ -14,7 +14,8 @@ try{
 		'forum'=>1,
 		'base'=>true,
 		'permisions'=>array(1),
-		'debug'=>true
+		'debug'=>true,
+		'user'=>2
 	);
 	$message = new MessageM($options);
 	$message->execute();
