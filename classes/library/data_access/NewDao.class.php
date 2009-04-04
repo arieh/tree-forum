@@ -414,7 +414,7 @@ class NewDao{
 		$sql = "DELETE FROM `$table` WHERE ";
 		$sep = '';
 		foreach ($conditions as $f => $v){
-			$sql.= "$sep `$f`=`$v` ";
+			$sql.= "$sep `$f`='$v' ";
 			$sep= 'AND';
 		}
 		return $this->query($sql,$log);
