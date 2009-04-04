@@ -4,7 +4,7 @@ Source Host: 192.168.2.104
 Source Database: tree-forum
 Target Host: 192.168.2.104
 Target Database: tree-forum
-Date: 04/04/2009 11:48:32
+Date: 04/04/2009 13:07:02
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -61,14 +61,16 @@ CREATE TABLE `messages` (
   `base` tinyint(1) NOT NULL default '0',
   `root_id` int(10) unsigned default NULL,
   `forum_id` int(10) unsigned NOT NULL,
-  `posted` timestamp NULL default NULL on update CURRENT_TIMESTAMP,
+  `posted` timestamp NULL default NULL,
+  `user_id` int(11) default '0',
+  `last_update` timestamp NULL default NULL on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `id` (`id`),
   KEY `forum_id` (`forum_id`),
   KEY `root_id` (`root_id`),
-  CONSTRAINT `root_id` FOREIGN KEY (`root_id`) REFERENCES `messages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `forum_id` FOREIGN KEY (`forum_id`) REFERENCES `forums` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+  CONSTRAINT `forum_id` FOREIGN KEY (`forum_id`) REFERENCES `forums` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `root_id` FOREIGN KEY (`root_id`) REFERENCES `messages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Table structure for permisions

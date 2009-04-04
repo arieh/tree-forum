@@ -1,1 +1,1 @@
-a:1:{s:6:"NewDao";s:47:"../classes/library/data_access/NewDao.class.php";}
+a:7:{s:6:"ForumM";s:38:"../classes/app/models/ForumM.class.php";s:6:"NewDao";s:47:"../classes/library/data_access/NewDao.class.php";s:8:"MessageM";s:40:"../classes/app/models/MessageM.class.php";s:10:"MysqlQuery";s:51:"../classes/library/data_access/MysqlQuery.class.php";s:14:"DaoMySQLresult";s:55:"../classes/library/data_access/DaoMySQLresult.class.php";s:4:"misc";s:33:"../classes/library/misc.class.php";s:11:"ModelResult";s:47:"../classes/library/models/ModelResult.class.php";}

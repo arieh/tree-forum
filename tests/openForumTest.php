@@ -16,7 +16,6 @@ try{
 }catch (Exception $e){
 	trigger_error($e->getMessage()." ON ".$e->getLine(). " IN ".$e->getFile());
 }
-
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -25,7 +24,7 @@ try{
 <?php
 while ($msg = $forum->getMessage()):?>
 <div style = 'margin-left:<?php echo ($msg->getDepth()*15);?>px'>
-	<?php echo $msg->getId();?>
+	<?php echo "ID:".$msg->getId()." :: ".$msg->getMessage()." : ".$msg->getTime();?>
 </div>
 <?php endwhile;
 ?>

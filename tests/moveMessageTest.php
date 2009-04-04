@@ -9,7 +9,7 @@ try{
 		
 	$options= array(
 		'action'=>'move',
-		'new-parent'=>26,//switch between 19 to 26 to see affects
+		'new-parent'=>30,//switch between 30 to 31 to see affects
 		'id'=>20,
 		'permisions'=>array(1),
 		'debug'=>true

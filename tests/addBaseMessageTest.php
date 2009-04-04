@@ -9,8 +9,8 @@ try{
 		
 	$options= array(
 		'action'=>'add',
-		'title'=>'test message',
-		'message'=>'this is a <strong>very important</strong> test',
+		'title'=>'a 3rd base message',
+		'message'=>'<u>LOL. this is kinky</u>',
 		'forum'=>1,
 		'base'=>true,
 		'permisions'=>array(1),

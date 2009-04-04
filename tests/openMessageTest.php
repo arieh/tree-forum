@@ -7,7 +7,7 @@ try{
 	NewDao::connect('mysql','localhost','root','pass','tree-forum');
 	NewDao::setLogger('fb');	
 		
-	$options= array('id'=>9,'action'=>'open','permisions'=>array(1),'debug'=>true);
+	$options= array('id'=>30,'action'=>'open','permisions'=>array(1),'debug'=>true);
 	$msgs= new MessageM($options);
 	$msgs->execute();
 	$prevDepth =0;
@@ -21,10 +21,9 @@ try{
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head><title>bla</title></head><body>
 <?php
-
 while ($msg = $msgs->getMessage()):?>
 <div style = 'margin-left:<?php echo ($msg->getDepth()*15);?>px'>
-	<?php echo $msg->getId();?>
+	<?php echo "ID:".$msg->getId()." :: ".$msg->getMessage()." : ".$msg->getTime();?>
 </div>
 <?php endwhile;
 ?>

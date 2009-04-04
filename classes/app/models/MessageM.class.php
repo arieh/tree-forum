@@ -240,7 +240,16 @@ class MessageM extends TFModel{
 	 * @access private
 	 */
 	private function postBaseMessage($forum,$title,$message,$log=false){
-		$this->_link->insert('messages',array('forum_id'=>$forum,'base'=>1),$log);
+		$this->_link->insert(
+			'messages',
+			array(
+				'forum_id'=>$forum,
+				'base'=>1,
+				'posted'=>'NOW()',
+				'last_update'=>'NOW()'
+				),
+			$log
+		);
 		$id = $this->_id = $this->_link->getLastId();
 		
 		$this->_link->update('messages',array('dna'=>$id,'root_id'=>$id),array('id'=>$id),$log);
@@ -251,8 +260,7 @@ class MessageM extends TFModel{
 				'message_id'=>$id,
 				'title'=>$title,
 				'message'=>$message,
-				'non-html'=>strip_tags($message),
-				'posted'=>'NOW()'
+				'non-html'=>strip_tags($message)
 			),
 			$log
 		);
@@ -269,7 +277,16 @@ class MessageM extends TFModel{
 	 */
 	private function postSubMessage($forum,$parent,$title,$message,$log=false){
 		$parentIds = $this->retrieveMessageIds($parent,$log);
-		$this->_link->insert('messages',array('forum_id'=>$forum,'base'=>0),$log);
+		$this->_link->insert(
+			'messages',
+			array(
+				'forum_id'=>$forum,
+				'base'=>0,
+				'posted'=>'NOW()',
+				'last_update'=>'NOW()'
+				),
+				$log
+			);
 		$id = $this->_id = $this->_link->getLastId();
 		
 		$dna = $parentIds['dna'].".".$id;
@@ -283,11 +300,11 @@ class MessageM extends TFModel{
 					'message_id'=>$id,
 					'title'=>$title,
 					'message'=>$message,
-					'non-html'=>strip_tags($message),
-					'posted'=>'NOW()'
+					'non-html'=>strip_tags($message)
 				),
 				$log
 		); 
+		$this->_link->update('messages',array('last_update'=>'NOW()'),array('id'=>$root),$this->isDebug());
 	}
 	
 	/**
@@ -330,6 +347,7 @@ class MessageM extends TFModel{
 		
 		$query->addSelect('messages',array());
 		$query->addSelect('message_contents',array('title','message'));
+		$query->addSelectFunction(array("DATE_FORMAT","'%d/%m/%Y - %H:%i:%S'"),'time','messages','posted');
 		
 		$query->addInnerJoin(array('messages'=>'id'),array('message_contents'=>'message_id'));
 		
@@ -352,6 +370,7 @@ class MessageM extends TFModel{
 		
 		$query->addSelect('messages',array());
 		$query->addSelect('message_contents',array('title','message'));
+		$query->addSelectFunction(array("DATE_FORMAT","'%d/%m/%Y - %H:%i:%S'"),'time','messages','posted');
 		
 		$query->addInnerJoin(array('messages'=>'id'),array('message_contents'=>'message_id'));
 		

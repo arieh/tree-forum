@@ -9,11 +9,11 @@ try{
 		
 	$options= array(
 		'action'=>'add',
-		'title'=>'test message',
-		'message'=>'this is a <strong>very important</strong> test',
+		'title'=>'another sub-sub message',
+		'message'=>'another sub-sub message to 3nd base message',
 		'forum'=>1,
 		'base'=>false,
-		'parent'=>9,
+		'parent'=>34,
 		'permisions'=>array(1),
 		'debug'=>true
 	);
