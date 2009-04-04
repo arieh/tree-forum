@@ -7,7 +7,7 @@ try{
 	NewDao::connect('mysql','localhost','root','pass','tree-forum');
 	NewDao::setLogger('fb');	
 		
-	$options= array('id'=>9,'action'=>'open','permisions'=>array(1));
+	$options= array('id'=>9,'action'=>'open','permisions'=>array(1),'debug'=>true);
 	$msgs= new MessageM($options);
 	$msgs->execute();
 	$prevDepth =0;

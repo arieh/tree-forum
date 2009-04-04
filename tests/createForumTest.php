@@ -23,7 +23,8 @@ try{
 				'permision_id'=>5,
 				'open'=>1
 			)
-		)
+		),
+		'debug'=>true
 	);
 	
 	$forum= new ForumM($options);

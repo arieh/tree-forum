@@ -7,13 +7,14 @@ try{
 	NewDao::connect('mysql','localhost','root','pass','tree-forum');
 	NewDao::setLogger('fb');	
 		
-	$options= array('id'=>1,'start'=>0,'limit'=>10,'permisions'=>array());
+	$options= array('id'=>1,'start'=>0,'limit'=>10,'permisions'=>array(1),'debug'=>true);
 	$forum= new ForumM($options);
 	$forum->execute();
 	$prevDepth =0;
 	$t = '';
+	foreach ($forum->getErrors() as $err) trigger_error($err);
 }catch (Exception $e){
-	echo $e->getMessage()." ON ".$e->getLine(). " IN ".$e->getFile();
+	trigger_error($e->getMessage()." ON ".$e->getLine(). " IN ".$e->getFile());
 }
 
 ?>

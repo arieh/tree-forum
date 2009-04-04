@@ -11,7 +11,8 @@ try{
 		'action'=>'edit',
 		'message'=>'an eddited message',
 		'id'=>9,
-		'permisions'=>array(1)
+		'permisions'=>array(1),
+		'debug'=>true
 	);
 	$message = new MessageM($options);
 	$message->execute();

@@ -13,7 +13,8 @@ try{
 		'message'=>'this is a <strong>very important</strong> test',
 		'forum'=>1,
 		'base'=>true,
-		'permisions'=>array(1)
+		'permisions'=>array(1),
+		'debug'=>true
 	);
 	$message = new MessageM($options);
 	$message->execute();
