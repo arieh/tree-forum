@@ -419,7 +419,22 @@ class NewDao{
 		}
 		return $this->query($sql,$log);
 	}	
-
+	
+	/** real_escape_string escapes a string using a database method
+	 * 		@param string $str : a string to be escaped
+	 * @access public
+	 * @return string 
+	 */
+	public function real_escape_string($str){
+		switch ($this->_type){
+			case 'mysqli':
+				return $this->_link->real_escape_string($str);
+			break;
+			case 'mysql':
+				return mysql_real_escape_string($str);
+			break;
+		}
+	}
 /* 
  * ==========================
  *     SQL Generators
@@ -439,7 +454,10 @@ class NewDao{
 				
 				for ($i=0;$i<count($vals);$i++){
 					if (in_array($vals[$i],$funcs)) $sur='';
-					elseif (is_numeric($vals[$i])==false && is_bool($vals[$i])==false) $sur="'";
+					elseif (is_numeric($vals[$i])==false && is_bool($vals[$i])==false){
+						$sur="'";
+						$vals[$i] = $this->real_escape_string($vals[$i]);
+					} 
 					else $sur="";
 					
 					if (is_bool($vals[$i])) $value = ($vals[$i]) ? 1 : 0;
@@ -464,7 +482,10 @@ class NewDao{
 				$sep="";
 				$sur = '';
 				foreach ($fields as $key=>$value){
-					$sur = (is_numeric($value) || is_bool($value))? '' : "'";
+					if (!is_numeric($value) && !is_bool($value)){
+						$sur = "'";
+						$value = $this->real_escape_string($value);
+					}
 					if (is_bool($value)) $value = ($value) ? 1 : 0;
 					$sql.=$sep."`$key`=".$sur.$value.$sur;
  					$sep = ',';
