@@ -184,9 +184,10 @@ class ForumM extends TFModel{
     	
     	$query->addSelect('messages',array());
     	
-    	//$query->addSelect('message_contents',array());
+    	$query->addSelect('message_contents',array());
+    	$query->addSelectFunction(array("DATE_FORMAT","'%d/%m/%Y - %H:%i:%S'"),'time','messages','posted');
     	
-    	//$query->addInnerJoin(array('messages'=>'id'),array('message_contents'=>'message_id'));
+    	$query->addInnerJoin(array('messages'=>'id'),array('message_contents'=>'message_id'));
     	
     	$query->addConditionSet(
     		$query->createCondition('messages','forum_id','=',$id),
@@ -194,6 +195,8 @@ class ForumM extends TFModel{
     	);
     	
     	$query->limit($start,$limit);
+    	$query->orderBy('messages','last_update');
+    	$query->orderDesc();
     	
     	$roots = $this->_link->queryArray($query->generate(),$log);
 		$ids = array();
@@ -219,8 +222,9 @@ class ForumM extends TFModel{
 				}
 			}
 			$r_messages = $this->orderMessages($r_messages);
-			$this->_messages[]=$root;
-			foreach($r_messages as $msg) $this->_messages[]=$msg;
+			
+			$this->_messages = array_merge($this->_messages,$r_messages);
+			$this->_messages[] = $root;
 		}
     }
     
@@ -230,11 +234,10 @@ class ForumM extends TFModel{
      */
     private function orderMessages($arr){
     	if (count($arr)==0) return array();
-    	
     	$keys = array_keys($arr);
     	natsort($keys);
     	$messages = $arr;
-    	$this->arr = array();
+    	$arr = array();
     	foreach ($keys as $key){
     		$messages[$key]['depth'] = count(explode('.',$messages[$key]['dna']));
     		$arr[] = $messages[$key];
