@@ -138,7 +138,7 @@ class ForumM extends Model{
 		$limit = $this->getOption('limit');
 			if (!$limit || !is_numeric($limit)) $limit = $this->_default_limit;
 		    	
-		$this->retrieveMessages($id,$start,$limit,true);
+		$this->retrieveMessages($id,$start,$limit,$this->isDebug());
 		$this->orderMessages();
   	}
   	
@@ -259,7 +259,7 @@ class ForumM extends Model{
     	$this->_id = $this->_link->getLastId();
     	$perms = $this->getOption('forum-permisions');
     	if (is_array($perms) && count($perms)>0){
-    		$this->addPermisions($perms,true);
+    		$this->addPermisions($perms,$this->isDebug());
     	}
     }
     

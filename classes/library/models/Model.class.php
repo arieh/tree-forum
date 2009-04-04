@@ -43,7 +43,17 @@ class Model{
 	 */
 	protected $_action = false;
 	
+	/**
+	 * @param array a set of current permision ids
+	 * @access protected
+	 */
 	protected $_permisions = array();
+	
+	/**
+	 * @param bool debug mode
+	 * @access protected
+	 */
+	 protected $_debug = false;
 	
 	/**
 	 * a constructor method for the object. sets the databse holder and the model options
@@ -58,11 +68,18 @@ class Model{
 		foreach ($options as $name => $value){
 			if (is_string($name)) $this->setOption($name,$value);
 		}
+		
+		if ($this->isOptionSet('debug')){
+			$this->_debug = ($this->getOption('debug')==true);
+			$this->setOption('debug',null); 
+		}
+		
 		if ($this->isOptionSet('permisions')){
 			$this->_permisions = $this->getOption('permisions');
 			$this->setOption('permisions',null);
 		} 
 		$this->setAction();
+		
 	}
 	
 	public function __destruct(){
@@ -196,6 +213,15 @@ class Model{
 	public function getErrors(){
 		return array_keys($this->_errors);
 	}
+	
+	/**
+	 * check if in debug mode
+	 * @access protected
+	 * @return bool
+	 */
+	 protected function isDebug(){
+	 	return ($this->_debug==true);
+	 }
 	
 	/**
 	 * returns a JSON representation of the object
