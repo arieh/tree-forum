@@ -58,6 +58,36 @@ class MessageM extends Model{
 	 */
 	private $_content = '';
 	
+	 /**
+     * @see <Model.class.php>
+     */
+    protected function checkPermision(){
+		$action = $this->getAction();
+    	while ($perm = $this->getPermision()){
+    				if ($this->doesHavePermision($action,$perm,true)) return true;
+    			}
+    			$this->setError('noPermision');
+    }
+	
+	/**
+     * checks if a specific permision id is allowed for this specific action
+     * 	@param string $action current action
+     * 	@param int $permision a permision id
+     * 	@param bool logg queries?
+     * @access private
+     * @return bool
+     */
+    private function doesHavePermision($action,$permision,$log=false){
+    	//if this action is forbiden for this permision
+    	if ($this->_link->countFields('forum_permisions',array($action=>0,'forum_id'=>$this->getForumId()),$log)>0) return false;
+    	
+    	//if this permision is globaly allowed
+    	if ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>0),$log)>0) return true;
+    	
+    	// if this permision is specificly allowed
+    	return ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>$this->getForumId()),$log)>0);
+    }
+	
 	/**
 	 * @see <Model.class.php>
 	 */
@@ -75,6 +105,9 @@ class MessageM extends Model{
 			case 'view':
 				$this->openMessage();
 			break;
+			case 'edit':
+				$this->editMessage();
+			break;
 		}
 	}
 	
@@ -87,6 +120,9 @@ class MessageM extends Model{
     	
     	switch ($action){
     		case 'view':
+    		case 'edit':
+    		case 'remove':
+    		case 'move':
     			$id = $this->getId();
     			if (!$id) $id = $this->getOption('id');
     			if (!$id || !is_numeric($id)) throw new MessageMException('badId');
@@ -97,6 +133,8 @@ class MessageM extends Model{
     		case 'add':
     			$forum_id = $this->getOption('forum');
     			if (!$forum_id || !is_numeric($forum_id)) throw new MessageMException('bad forum id');
+    			$this->_id = $this->getOption('id');
+    			$this->_forum_id = $forum_id;
     		break;
     	}
 	}
@@ -299,34 +337,9 @@ class MessageM extends Model{
     	$this->_messages = array_reverse($this->_messages);
     }
     
-    /**
-     * @see <Model.class.php>
-     */
-    protected function checkPermision(){
-		$action = $this->getAction();
-    	while ($perm = $this->getPermision()){
-    				if ($this->doesHavePermision($action,$perm,true)) return true;
-    			}
-    			$this->setError('noPermision');
-    }
-	
-	/**
-     * checks if a specific permision id is allowed for this specific action
-     * 	@param string $action current action
-     * 	@param int $permision a permision id
-     * 	@param bool logg queries?
-     * @access private
-     * @return bool
-     */
-    private function doesHavePermision($action,$permision,$log=false){
-    	//if this action is forbiden for this permision
-    	if ($this->_link->countFields('forum_permisions',array($action=>0,'forum_id'=>$this->getForumId()),$log)>0) return false;
+    
+    private function editMessage(){
     	
-    	//if this permision is globaly allowed
-    	if ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>0),$log)>0) return true;
-    	
-    	// if this permision is specificly allowed
-    	return ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>$this->getForumId()),$log)>0);
     }
 }
 
