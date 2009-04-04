@@ -17,6 +17,12 @@
  * 			- 'id'(int) : message id
  * 		optional:
  * 			- 'children' : retrieve message children? default: true
+ * + 'edit' : submmits an edited message
+ * 		required:
+ * 			- id (int) : message id
+ * 			- 'message' (string) : new content - must be longer than 2 chars
+ * 		errors:
+ * 			- 'shortContent' : invalid content 
  * 		
  */ 
 class MessageM extends Model{
@@ -28,7 +34,7 @@ class MessageM extends Model{
 	/**
 	 * @see <Model.class.php>
 	 */
-	protected $_actions = array('view','add'/*,'edit','remove','move'*/);
+	protected $_actions = array('view','add','edit'/*,'remove','move'*/);
 	
 	/**
 	 * @param int message id
@@ -79,7 +85,7 @@ class MessageM extends Model{
      */
     private function doesHavePermision($action,$permision,$log=false){
     	//if this action is forbiden for this permision
-    	if ($this->_link->countFields('forum_permisions',array($action=>0,'forum_id'=>$this->getForumId()),$log)>0) return false;
+    	if ($this->_link->countFields('forum_permisions',array($action=>0,'forum_id'=>$this->getForumId(),'permision_id'=>$permision),$log)>0) return false;
     	
     	//if this permision is globaly allowed
     	if ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>0),$log)>0) return true;
@@ -123,12 +129,13 @@ class MessageM extends Model{
     		case 'edit':
     		case 'remove':
     		case 'move':
-    			$id = $this->getId();
+    			$this->_id = $id = $this->getOption('id');
+    			$forum = $this->_forum_id = $this->retrieveForumId($id,false);
     			if (!$id) $id = $this->getOption('id');
     			if (!$id || !is_numeric($id)) throw new MessageMException('badId');
-    			if (!$this->doesMessageExists($id)) throw new MessageMException('badId');
+    			if (!$this->doesMessageExists($id,$forum)) throw new MessageMException('badId');
     			
-    			$this->_forum_id = $this->retrieveForumId($id,false);
+    			
     		break;
     		case 'add':
     			$forum_id = $this->getOption('forum');
@@ -137,6 +144,18 @@ class MessageM extends Model{
     			$this->_forum_id = $forum_id;
     		break;
     	}
+	}
+	
+	/**
+	 * retrieves the forum id of a message
+	 * 	@param int $id message id
+	 * 	@param bool $log log queries?
+	 * @access private
+	 * @return bool 
+	 */
+	private function retrieveForumId($id,$log=false){
+		$res = $this->_link->select('messages',array('forum_id'),array('id'=>$id),true,$log);
+		return (int)$res['forum_id'];
 	}
 	
 	/**
@@ -261,15 +280,16 @@ class MessageM extends Model{
 	 * @access private
 	 */
 	private function openMessage(){
-		$id = $this->getId();
-		$msg = $this->retrieveMessageInfo($id,false);
+		$this->_id = $id = $this->getId();
+		
+		$msg = $this->retrieveMessageInfo($id,true);
 		$this->_id = $id;
 		$this->_title = $msg['title'];
 		$this->_content = $msg['message'];
 		
 		if ($this->isOptionSet('children') && $this->getOption('children') == false) return;
 		
-		$this->retrieveMessages($msg['dna'],false);
+		$this->retrieveMessages($msg['dna'],true);
 		$this->orderMessages();
 	}
 	
@@ -337,9 +357,20 @@ class MessageM extends Model{
     	$this->_messages = array_reverse($this->_messages);
     }
     
-    
+    /**
+     * submits an eddited message
+     */
     private function editMessage(){
+    	$id = $this->getId();
+    	if (!$id) $id = $this->_id = $this->getOption('id');
+    	if (!$id || !$this->doesMessageExists($id,true)) throw new MessageMException('bad id');
     	
+    	$content = $this->getOption('message');
+    	if (!$content || strlen($content)<2) $this->setError('shortContent');
+    	
+    	if ($this->isError()) return false;
+    	
+    	$this->_link->update('message_contents',array('message'=>$content,'non-html'=>strip_tags($content)),array('message_id'=>$id),true); 
     }
 }
 
