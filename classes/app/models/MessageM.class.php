@@ -23,6 +23,12 @@
  * 			- 'message' (string) : new content - must be longer than 2 chars
  * 		errors:
  * 			- 'shortContent' : invalid content 
+ * + 'move' : moves a message from one tree to another
+ * 		requiered:
+ * 			- id (int) : message id
+ * 		optional:
+ * 			- new-parent (id) : new parent's id. requierd if not base
+ * 			- base (bool) : whether to make the message a root message
  * 		
  */ 
 class MessageM extends Model{
@@ -34,7 +40,7 @@ class MessageM extends Model{
 	/**
 	 * @see <Model.class.php>
 	 */
-	protected $_actions = array('view','add','edit'/*,'remove','move'*/);
+	protected $_actions = array('view','add','edit','move'/*,'remove'*/);
 	
 	/**
 	 * @param int message id
@@ -114,6 +120,9 @@ class MessageM extends Model{
 			case 'edit':
 				$this->editMessage();
 			break;
+			case 'move':
+				$this->moveMessage();
+			break;
 		}
 	}
 	
@@ -189,8 +198,8 @@ class MessageM extends Model{
 		/*
 		 * post message
 		 */
-		if ($base) $this->postBaseMessage($forum,$title,$message,true);
-		else $this->postSubMessage($forum,$parent,$title,$message,true);
+		if ($base) $this->postBaseMessage($forum,$title,$message,$this->isDebug());
+		else $this->postSubMessage($forum,$parent,$title,$message,$this->isDebug());
 	}
 	
 	/**
@@ -282,14 +291,14 @@ class MessageM extends Model{
 	private function openMessage(){
 		$this->_id = $id = $this->getId();
 		
-		$msg = $this->retrieveMessageInfo($id,true);
+		$msg = $this->retrieveMessageInfo($id,$this->isDebug());
 		$this->_id = $id;
 		$this->_title = $msg['title'];
 		$this->_content = $msg['message'];
 		
 		if ($this->isOptionSet('children') && $this->getOption('children') == false) return;
 		
-		$this->retrieveMessages($msg['dna'],true);
+		$this->retrieveMessages($msg['dna'],$this->isDebug());
 		$this->orderMessages();
 	}
 	
@@ -370,8 +379,87 @@ class MessageM extends Model{
     	
     	if ($this->isError()) return false;
     	
-    	$this->_link->update('message_contents',array('message'=>$content,'non-html'=>strip_tags($content)),array('message_id'=>$id),true); 
+    	$this->_link->update('message_contents',array('message'=>$content,'non-html'=>strip_tags($content)),array('message_id'=>$id),$this->isDebug()); 
     }
+    
+    /**
+     * moves a mesage to a different tree
+     */
+    private function moveMessage(){
+    	$id = $this->getId();
+    	$forum = $this->getForumId();
+    	$oldDna = $this->retrieveDna($id,$this->isDebug());
+    	$base = ($this->isOptionSet('base')) ? $this->getOption('base') : false;
+    	if ($base){
+    		$newDna = $this->getId();
+    		$new_root = $this->getId();
+    	}else{
+    		$newParent = $this->getOption('new-parent');
+    	
+	    	if (!$newParent || !is_numeric($newParent) || !$this->doesMessageExists($newParent,$forum))
+	    		throw new MessageMException('bad new parent');
+	    	
+	    	$parentDna = $this->retrieveDna($newParent,$this->isDebug());
+	    	$newDna = $parentDna.".".$id;	
+	    	$new_root = $this->retrieveRoot($newParent,$this->isDebug());
+    	}
+    	
+    	$children = $this->retrieveChildrenIds($oldDna,$this->isDebug());
+		
+		$newRecords[] = array('id'=>$id,'dna'=>$newDna);
+
+		foreach ($children as $child){
+			$raw_dna = explode($oldDna.".",$child['dna']);
+			$raw_dna = $raw_dna[1];
+			$arr = array('id'=>$child['id'],'dna'=>$newDna.".".$raw_dna);
+			$newRecords[]=$arr;
+		}
+		
+		foreach ($newRecords as $record){
+			$this->_link->update('messages',array('dna'=>$record['dna'],'root_id'=>$new_root),array('id'=>$record['id']),$this->isDebug());
+		} 
+		 
+		if ($base){
+			$this->_link->update('messages',array('base'=>true),array('id'=>$id),$this->isDebug());
+		} 		
+    }
+    
+    /**
+     * returns a message's dna
+     * 	@param int $id a message id
+     * 	@param bool $log log queries?
+     * @access private
+     */
+    private function retrieveDna($id,$log=false){
+    	$res = $this->_link->select('messages',array('dna'),array('id'=>$id),true,$log);
+    	return $res['dna'];
+    }
+    
+    private function retrieveRoot($id,$log=false){
+    	$res = $this->_link->select('messages',array('root_id'),array('id'=>$id),true,$log);
+    	return $res['root_id'];
+    }
+    
+    /**
+     * returns a message's children's ids
+     * 	@param string $dna a message's dna
+     * 	@param bool $log log queries?
+     * @access private
+     */
+    private function retrieveChildrenIds($dna,$log=false){
+    	$query = NewDao::getGenerator();
+		
+		$query->addSelect('messages',array());
+		
+		$query->addConditionSet(
+			//this needs to be revised. should find a way to do this without a LIKE statement
+			$query->createCondition('messages','dna','LIKE',$dna.".%")
+		);
+		
+		return $this->_link->queryArray($query->generate(),$log);
+    }
+    
+    
 }
 
 class MessageMException extends ModelException{}
