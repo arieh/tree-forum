@@ -139,7 +139,6 @@ class ForumM extends TFModel{
 			if (!$limit || !is_numeric($limit)) $limit = $this->_default_limit;
 		    	
 		$this->retrieveMessages($id,$start,$limit,$this->isDebug());
-		$this->orderMessages();
   	}
   	
   	/**
@@ -210,26 +209,37 @@ class ForumM extends TFModel{
 		
 		$sons = $this->_link->queryArray($query->generate(),$log);
 		
-		foreach ($roots as $msg) $this->_messages[$msg['dna']]=$msg;
-		foreach ($sons  as $msg) $this->_messages[$msg['dna']]=$msg;
+		foreach ($roots as $root){
+			$r_id = $root['id'];
+			$r_messages = array();
+			foreach ($sons as &$son){
+				if ($son['root_id']==$r_id){
+					$r_messages[$son['dna']]=$son;
+					unset($son);
+				}
+			}
+			$r_messages = $this->orderMessages($r_messages);
+			$this->_messages[]=$root;
+			foreach($r_messages as $msg) $this->_messages[]=$msg;
+		}
     }
     
     /**
      * orders the messages retrieved from the database
      * @access private
      */
-    private function orderMessages(){
-    	if (count($this->_messages)==0) return;
+    private function orderMessages($arr){
+    	if (count($arr)==0) return array();
     	
-    	$keys = array_keys($this->_messages);
+    	$keys = array_keys($arr);
     	natsort($keys);
-    	$messages = $this->_messages;
-    	$this->_messages = array();
+    	$messages = $arr;
+    	$this->arr = array();
     	foreach ($keys as $key){
     		$messages[$key]['depth'] = count(explode('.',$messages[$key]['dna']));
-    		$this->_messages[] = $messages[$key];
+    		$arr[] = $messages[$key];
     	}
-    	$this->_messages = array_reverse($this->_messages);
+    	return array_reverse($arr);
     }
     
     /**
