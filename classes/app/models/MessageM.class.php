@@ -251,7 +251,8 @@ class MessageM extends TFModel{
 				'message_id'=>$id,
 				'title'=>$title,
 				'message'=>$message,
-				'non-html'=>strip_tags($message)
+				'non-html'=>strip_tags($message),
+				'posted'=>'NOW()'
 			),
 			$log
 		);
@@ -276,7 +277,17 @@ class MessageM extends TFModel{
 		
 		$this->_link->update('messages',array('dna'=>$dna,'root_id'=>$root),array('id'=>$id),$log);
 		
-		$this->_link->insert('message_contents',array('message_id'=>$id,'title'=>$title,'message'=>$message,'non-html'=>strip_tags($message)),$log); 
+		$this->_link->insert(
+				'message_contents',
+				array(
+					'message_id'=>$id,
+					'title'=>$title,
+					'message'=>$message,
+					'non-html'=>strip_tags($message),
+					'posted'=>'NOW()'
+				),
+				$log
+		); 
 	}
 	
 	/**

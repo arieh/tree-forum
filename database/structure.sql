@@ -61,6 +61,7 @@ CREATE TABLE `messages` (
   `base` tinyint(1) NOT NULL default '0',
   `root_id` int(10) unsigned default NULL,
   `forum_id` int(10) unsigned NOT NULL,
+  `posted` timestamp NULL default NULL on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `id` (`id`),
   KEY `forum_id` (`forum_id`),
