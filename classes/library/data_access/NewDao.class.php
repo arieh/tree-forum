@@ -481,8 +481,12 @@ class NewDao{
 				$sql .= "SET ";			
 				$sep="";
 				$sur = '';
+				
+				$funcs = array('CURDATE()','NOW()'); 
+				
 				foreach ($fields as $key=>$value){
-					if (!is_numeric($value) && !is_bool($value)){
+					if (in_array($value,$funcs)) $sur='';
+					elseif (!is_numeric($value) && !is_bool($value)){
 						$sur = "'";
 						$value = $this->real_escape_string($value);
 					}
