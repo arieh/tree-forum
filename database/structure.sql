@@ -4,7 +4,7 @@ Source Host: 192.168.2.104
 Source Database: tree-forum
 Target Host: 192.168.2.104
 Target Database: tree-forum
-Date: 03/04/2009 12:05:18
+Date: 04/04/2009 11:48:32
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -22,6 +22,7 @@ CREATE TABLE `forum_permisions` (
   `edit` tinyint(1) NOT NULL default '0',
   `create` tinyint(1) NOT NULL default '0',
   `remove` tinyint(1) NOT NULL default '0',
+  `move` tinyint(1) NOT NULL default '0',
   KEY `permision_id` (`permision_id`),
   CONSTRAINT `forum_permisions_ibfk_3` FOREIGN KEY (`permision_id`) REFERENCES `permisions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -36,7 +37,7 @@ CREATE TABLE `forums` (
   `name` varchar(45) NOT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `message_id` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for message_contents
@@ -76,4 +77,4 @@ CREATE TABLE `permisions` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `name` varchar(45) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;

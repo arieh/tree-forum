@@ -1,15 +1,11 @@
-
-
 -- ----------------------------
 -- Records 
 -- ----------------------------
-INSERT INTO `forum_permisions` VALUES ('1', '0', '1', '1', '1', '1', '1', '1', '1');
-INSERT INTO `forum_permisions` VALUES ('2', '1', '1', '1', '1', '1', '1', '0', '0');
-INSERT INTO `forum_permisions` VALUES ('3', '1', '1', '1', '0', '0', '0', '0', '0');
+
 INSERT INTO `forums` VALUES ('1', 'test forum', 'testing');
 INSERT INTO `forums` VALUES ('3', 'forum creation test', 'another test');
-INSERT INTO `message_contents` VALUES ('test message', 'this is a <strong>very important</strong> test', 'this is a very important test', '0');
-INSERT INTO `message_contents` VALUES ('test message', 'this is a <strong>very important</strong> test', 'this is a very important test', '9');
+INSERT INTO `forums` VALUES ('14', 'a forum with a permision', 'random forum');
+INSERT INTO `message_contents` VALUES ('test message', 'an eddited message', 'an eddited message', '9');
 INSERT INTO `message_contents` VALUES ('test message', 'this is a <strong>very important</strong> test', 'this is a very important test', '10');
 INSERT INTO `message_contents` VALUES ('test message', 'this is a <strong>very important</strong> test', 'this is a very important test', '19');
 INSERT INTO `message_contents` VALUES ('test message', 'this is a <strong>very important</strong> test', 'this is a very important test', '20');
@@ -23,12 +19,8 @@ INSERT INTO `messages` VALUES ('9', '9', '1', '9', '1');
 INSERT INTO `messages` VALUES ('10', '10', '1', '10', '3');
 INSERT INTO `messages` VALUES ('19', '9.19', '0', '9', '1');
 INSERT INTO `messages` VALUES ('20', '9.19.20', '0', '9', '1');
-INSERT INTO `messages` VALUES ('21', '9.21', '0', '9', '1');
 INSERT INTO `messages` VALUES ('22', '9.22', '0', '9', '1');
 INSERT INTO `messages` VALUES ('23', '9.19.20.23', '0', '9', '1');
 INSERT INTO `messages` VALUES ('24', '9.19.24', '0', '9', '1');
 INSERT INTO `messages` VALUES ('25', '9.19.20.23.25', '0', '9', '1');
 INSERT INTO `messages` VALUES ('26', '26', '1', '26', '1');
-INSERT INTO `permisions` VALUES ('1', 'admin');
-INSERT INTO `permisions` VALUES ('2', 'test_editor');
-INSERT INTO `permisions` VALUES ('3', 'test_user');
