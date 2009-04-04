@@ -55,6 +55,55 @@ class ForumM extends Model{
 	 * @access protected
 	 */
 	protected $_id = 0;
+	
+	/**
+     * @see <Model.class.php>
+     */
+    protected function checkPermision(){
+    	
+    	if ($this->doesHavePermisions()==false){
+    		$this->setError('noPermision');
+    		return false;
+    	}
+    		
+    	$action = $this->getAction();
+    	
+    	if ($action=='open') {
+    		$this->_id = $id = $this->getOption('id');
+    		if (!$id || !is_numeric($id) || !$this->doesForumExists($id,true)) throw new ForumMException('forum id is invalid');
+    	}
+    	
+    	if ($this->isError()){
+    		$this->setError('noPermision');
+    		return false;
+    	}
+    	
+    	while ($permision = $this->getPermision()){
+    		if ($this->doesHavePermision($action,$permision,true)) return true;
+    	}
+    	$this->setError('noPermision');
+    	return false;
+    }
+    
+    /**
+     * checks if a specific permision id is allowed for this specific action
+     * 	@param string $action current action
+     * 	@param int $permision a permision id
+     * 	@param bool logg queries?
+     * @access private
+     * @return bool
+     */
+    private function doesHavePermision($action,$permision,$log=false){
+    	//if this action is forbiden for this permision
+    	if ($this->_link->countFields('forum_permisions',array($action=>0,'forum_id'=>$this->getId()),$log)>0) return false;
+    	
+    	//if this permision is globaly allowed
+    	if ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>0),$log)>0) return true;
+    	
+    	// if this permision is specificly allowed
+    	return ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>$this->getId()),$log)>0);
+    }
+	
     /**
 	 * @see <Model.class.php>
 	 */
@@ -212,51 +261,6 @@ class ForumM extends Model{
     	if (is_array($perms) && count($perms)>0){
     		$this->addPermisions($perms,true);
     	}
-    }
-    
-    /**
-     * @see <Model.class.php>
-     */
-    protected function checkPermision(){
-    	
-    	if ($this->doesHavePermisions()==false){
-    		$this->setError('noPermision');
-    		return false;
-    	}
-    		
-    	$action = $this->getAction();
-    	
-    	if ($action=='open') $this->getForumId();
-    	
-    	if ($this->isError()){
-    		$this->setError('noPermision');
-    		return false;
-    	}
-    	
-    	while ($permision = $this->getPermision()){
-    		if ($this->doesHavePermision($action,$permision,true)) return true;
-    	}
-    	$this->setError('noPermision');
-    	return false;
-    }
-    
-    /**
-     * checks if a specific permision id is allowed for this specific action
-     * 	@param string $action current action
-     * 	@param int $permision a permision id
-     * 	@param bool logg queries?
-     * @access private
-     * @return bool
-     */
-    private function doesHavePermision($action,$permision,$log=false){
-    	//if this action is forbiden for this permision
-    	if ($this->_link->countFields('forum_permisions',array($action=>0,'forum_id'=>$this->getId()),$log)>0) return false;
-    	
-    	//if this permision is globaly allowed
-    	if ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>0),$log)>0) return true;
-    	
-    	// if this permision is specificly allowed
-    	return ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>$this->getId()),$log)>0);
     }
     
     /**
