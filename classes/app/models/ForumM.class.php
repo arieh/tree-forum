@@ -48,7 +48,7 @@ class ForumM extends Model{
 	 * @param array allowed permisions for messages.
 	 * @access private
 	 */
-	 private $_message_actions =  array('view','add'/*,'edit','remove','move'*/);
+	 private $_message_actions =  array('view','add','edit','remove','move');
 	
 	/**
 	 * @param int forum id
