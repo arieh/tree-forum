@@ -8,6 +8,14 @@
  * 		optional: 
  * 			- start(int) how many root messages to skip
  * 			- limit(int) how many root messages to pull
+ * 		accessors:
+ * 			- getId() - returns forum id
+ * 			- getMessage() - return a message accessor from the message-tree:
+ * 					+ getId()
+ * 					+ getTitle()
+ * 					+ getMessage() - returns message content
+ * 					+ getTime()
+ * 					+ getUserId()
  * + 'create': create a forum
  * 		required:
  * 			- name (string) forum name. must be longer than 3 chars
@@ -19,6 +27,11 @@
  * 		errors: 
  * 			- 'shortName' : forum name is invalid (empty, too short, or not a string)
  * 			- 'shortDesc' : forum description is invalid (empty, too short, or not a string)
+ * 		accessors: getId()
+ * 
+ * 
+ * returned object for getMessage() will have the following methods:
+ * getId(), getTitle(), getTime(), getContent()
  */
 
 class ForumM extends TFModel{

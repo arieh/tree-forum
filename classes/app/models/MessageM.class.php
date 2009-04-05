@@ -18,6 +18,16 @@
  * 			- 'id'(int) : message id
  * 		optional:
  * 			- 'children' : retrieve message children? default: true
+ * 		accessors:
+ * 			- getId()
+ * 			- getTitle()
+ * 			- getContent()
+ * 			- getMessage() - return a message accessor from the sub-message tree:
+ * 					+ getId()
+ * 					+ getTitle()
+ * 					+ getMessage() returns message's content
+ * 					+ getTime()
+ * 					+ getUserId()
  * + 'edit' : submmits an edited message
  * 		required:
  * 			- id (int) : message id
