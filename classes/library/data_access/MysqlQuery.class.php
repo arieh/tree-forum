@@ -62,6 +62,7 @@ class MysqlQuery implements Query{
 	 * @comment for table arrays, an associative array, where the index is table name and the value is field-arrays as mentioned above
 	 * 
 	 * @access public  
+	 * @return Query a referance to the object
 	 */
 	public function addSelect($table,$field=false){
 		if (is_string($table) && is_array($field)){
@@ -75,6 +76,7 @@ class MysqlQuery implements Query{
 				$this->addSelect($tbl,$fields);
 			}
 		}
+		return $this;
 	}
 	
 	/**
@@ -86,6 +88,7 @@ class MysqlQuery implements Query{
 	 * @param string       $field    field name
 	 * 
 	 * @access public
+	 * @return Query a referance to the object
 	 */
 	public function addSelectFunction($function,$alias='',$table=false,$field=false){
 		if (in_array($function,$this->_functions)){
@@ -96,6 +99,7 @@ class MysqlQuery implements Query{
 		if(in_array($func[0],$this->_functions)){
 			$this->_selectFuncs[]=array($func,$alias,$table,$field);
 		}
+		return $this;
 	}
 	
 	/**
@@ -105,9 +109,11 @@ class MysqlQuery implements Query{
 	 * @param array $table2 the to-be-joined table. array or table name => field name
 	 * 
 	 * @access public
+	 * @return Query a referance to the object
 	 */
 	public function addInnerJoin($table1,$table2){
 		array_push($this->_innerJoins,array($table1,$table2));
+		return $this;
 	}
 	
 	/**
@@ -158,6 +164,7 @@ class MysqlQuery implements Query{
 	 * @param subCondition|array any number of condition objects and arrays of conditions (arrays will be handled as separate condition sets)
 	 * 
 	 * @access public 
+	 * @return Query a referance to the object
 	 */
 	public function addConditionSet(){
 		$conds = func_get_args();
@@ -174,6 +181,7 @@ class MysqlQuery implements Query{
 			}
 		}
 		array_push($this->_conditionSets,$arr);
+		return $this;
 	}
 	
 	/**
@@ -183,6 +191,7 @@ class MysqlQuery implements Query{
 	 * @param string       $field if first var was table name, table field to group by
 	 * 
 	 * @access public 
+	 * @return Query a referance to the object
 	 */
 	public function groupBy($table,$field=''){
 		if (is_string($table)){
@@ -193,6 +202,7 @@ class MysqlQuery implements Query{
 				$this->_group[]=$value;
 			}			
 		}
+		return $this;
 	}
 	
 	/**
@@ -201,6 +211,7 @@ class MysqlQuery implements Query{
 	 * 	@param string       $field if first var was table name, table field to group by
 	 * 
 	 * @access public 
+	 * @return Query a referance to the object
 	 */
 	public function orderBy($table,$field=''){
 		if (is_string($table)){
@@ -211,19 +222,22 @@ class MysqlQuery implements Query{
 				$this->_order[]=$value;
 			}			
 		}
+		return $this;
 	}
 	
 	/**
 	 * sets the ordering order to Ascending
 	 * @access public
+	 * @return Query a referance to the object
 	 */
-	public function orderAsc(){$this->_orderDesc = false;}
+	public function orderAsc(){$this->_orderDesc = false; return $this;}
 	
 	/**
 	 * sets the ordering order to descending
 	 * @access public
+	 * @return Query a referance to the object
 	 */
-	public function orderDesc(){$this->_orderDesc = true;}
+	public function orderDesc(){$this->_orderDesc = true; return $this;}
 	
 	/**
 	 * sets a limit to the results
@@ -231,11 +245,13 @@ class MysqlQuery implements Query{
 	 * 	@param int $c how many results to fetch
 	 * 
 	 * @access public
+	 * @return Query a referance to the object
 	 */
 	public function limit($s,$c=false){
 		if (!is_numeric($s)) return false;
 		if ($c && is_numeric($c)) $this->_limit = array((int)$s,(int)$c);
 		else $this->_limit = array((int)$s);
+		return $this;
 	}
 	
 	/**
@@ -458,14 +474,17 @@ class MysqlQuery implements Query{
 	/**
 	 * resets all condition sets
 	 * @access public
+	 * @return Query a referance to the object
 	 */
 	public function resetConditions(){
 		$this->_conditionSets = array();
+		return $this;
 	}
 	
 	/**
 	 * resets all query paramaters
 	 * @access public
+	 * @return Query a referance to the object
 	 */
 	public function reset(){
 		$this->_selectFuncs = array();
@@ -476,6 +495,7 @@ class MysqlQuery implements Query{
 		$this->_order = array();
 		$this->_limit = array();
 		$this->_orderDesc = true;
+		return $this;
 	}
 }
 

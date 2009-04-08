@@ -23,6 +23,7 @@ interface Query{
 	 * @param string       $field    field name
 	 * 
 	 * @access public
+	 * @return Query a referance to the object
 	 */
 	public function addSelectFunction($function,$alias='',$table=false,$field=false);
 	
@@ -33,6 +34,7 @@ interface Query{
 	 * @param array $table2 the to-be-joined table. array or table name and field name
 	 * 
 	 * @access public
+	 * @return Query a referance to the object
 	 */
 	public function addInnerJoin($table1,$table2);
 	
@@ -58,6 +60,7 @@ interface Query{
 	 * @param subCondition|array any number of condition objects and arrays of conditions (arrays will be handled as separate condition sets)
 	 * 
 	 * @access public 
+	 * @return Query a referance to the object
 	 */
 	public function addConditionSet();
 	
@@ -75,7 +78,8 @@ interface Query{
 	 * @param string|array $table table name|associative array of table=>field
 	 * @param string       $field if first var was table name, table field to group by
 	 * 
-	 * @access public 
+	 * @access public
+	 * @return Query a referance to the object 
 	 */
 	public function groupBy($table,$field='');
 	
@@ -85,6 +89,7 @@ interface Query{
 	 * 	@param string       $field if first var was table name, table field to group by
 	 * 
 	 * @access public 
+	 * @return Query a referance to the object
 	 */
 	public function orderBy($table,$field='');
 	
@@ -94,6 +99,7 @@ interface Query{
 	 * 	@param int $c how many results to fetch
 	 * 
 	 * @access public
+	 * @return Query a referance to the object
 	 */
 	public function limit($s,$c=false);
 }
