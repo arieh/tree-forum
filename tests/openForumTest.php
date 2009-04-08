@@ -14,7 +14,7 @@ try{
 	$t = '';
 	foreach ($forum->getErrors() as $err) trigger_error($err);
 }catch (Exception $e){
-	trigger_error($e->getMessage()." ON ".$e->getLine(). " IN ".$e->getFile());
+	trigger_error($e);
 }
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"

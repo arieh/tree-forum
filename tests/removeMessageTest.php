@@ -20,6 +20,6 @@ try{
 		foreach ($errs as $err) trigger_error($err);
 	}
 }catch (Exception $e){
-	trigger_error($e->getMessage()." ON ".$e->getLine(). " IN ".$e->getFile());
+	trigger_error($e);
 }
 ?>

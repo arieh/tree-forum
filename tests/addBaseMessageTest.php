@@ -24,6 +24,6 @@ try{
 		foreach ($errs as $err) echo "$err<br>";
 	}
 }catch (Exception $e){
-	echo $e->getMessage()." ON ".$e->getLine(). " IN ".$e->getFile();
+	trigger_error($e);
 }
 ?>

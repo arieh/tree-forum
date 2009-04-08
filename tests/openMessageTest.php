@@ -13,7 +13,7 @@ try{
 	$prevDepth =0;
 	$t = '';
 }catch (Exception $e){
-	echo $e->getMessage()." ON ".$e->getLine(). " IN ".$e->getFile();
+	trigger_error($e);
 }
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"

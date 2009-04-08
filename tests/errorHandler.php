@@ -1,5 +1,8 @@
 <?php
 function TF_Error_Handler($errno,$str,$file,$line){
+	
+		$stack = debug_backtrace();	
+	
 	$error = "ERROR: "
 			.$str." \n"
 			."On Line: $line "
@@ -10,7 +13,7 @@ function TF_Error_Handler($errno,$str,$file,$line){
 		fb($error);
 	}
 	
-	$stack = debug_backtrace();
+	
   		
   		array_shift($stack);
   		$stackstr = '';
