@@ -435,6 +435,11 @@ class NewDao{
 			break;
 		}
 	}
+	
+	static function escape($str){
+		if (self::$_instance) return self::$_instance->real_escape_string($str);
+		else throw new NewDaoException('cannot escape string when not connected');
+	}
 /* 
  * ==========================
  *     SQL Generators
