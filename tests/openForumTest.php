@@ -4,10 +4,16 @@ require_once('autoloader.php');
 require_once('..'._SEP_.'classes'._SEP_.'library'._SEP_.'firePHP'._SEP_.'fb.php');
 require_once('errorHandler.php');
 try{
-	NewDao::connect('mysql','localhost','root','pass','tree-forum');
+	NewDao::connect('mysql','localhost','root','rjntqvzz','tree-forum');
 	NewDao::setLogger('fb');	
-		
-	$options= array('id'=>1,'start'=>0,'limit'=>10,'permisions'=>array(1),'debug'=>true);
+	UserM::setId(1);
+	$options= array(
+		'id'=>1,
+		'start'=>0,
+		'limit'=>10,
+		'permisions'=>UserM::getInstance()->getPermissions(false),
+		'debug'=>true
+	);
 	$forum= new ForumM($options);
 	$forum->execute();
 	$prevDepth =0;
