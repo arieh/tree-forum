@@ -19,7 +19,7 @@ $query->addSelect('table1',array()); #`table1`.*
 $query->addSelect('table2',array('id'=>'t2_id')); #`table2`.`id` as `t2_id`
 
 /* using MYSQL functions:*/ 
-$query->addSelectFunction('LCASE','lcased_name','table2','name'); 
+$query->addSelectFunction('LCASE','lcased_name','table2','name') ;
 #LCASE(`table2`.`name`) as `lcased_name`
 
 /* using functions with passed arguments: */
