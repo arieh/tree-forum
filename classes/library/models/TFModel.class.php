@@ -209,7 +209,7 @@ class TFModel{
 	 * @access public
 	 * @return array
 	 */
-	protected function getErrors(){
+	public function getErrors(){
 		return array_keys($this->_errors);
 	}
 	
