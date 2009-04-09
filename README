@@ -1,0 +1,54 @@
+TREE-FORUM 0.3
+===============
+
+this library is intended to work under MVC lik design patterns. for this stage of development, the main effort is on
+supplying the back-end logic needed to create and maintain tree-structerd forums. 
+there is no wiki for now, but the classes are well documented, and each class file starts with an api. also, 
+almost all actions have their own test case, so its best to just look at them to learn how to use the classes properly.
+the package comes with 3 sql files- the schema and required are, as their name imply, required. the test-data is to let you get the
+feel of the system as it developes. if you are using previous versions of the library reset your DB.
+
+  1. Main Classes:
+  ===============
+  the library consists on 2 main layers for now- 
+  * the NewDao class family (NewDao,DaoResult,Query), which supplies a database abstractation,
+    and uses the singelton pattern.
+  * the TFModel class family (TFModel,ModelResult), which supplies the core functionalities, and uses the NewDao as its DB layer. 
+
+  2. Main Concepts:
+  ================
+  the main thought behind the architecture is portability. this is mainly achived through the structure of the TFModel
+  family. each model has a pre-set list of actions it can preform, and each has a specific set of expected paramaters. 
+  all paramaters are forwarded through an associative array at construction, and the classes as a rule don't use external 
+  dependancies, other than the required library files. this makes each class independant, and completly portable by itself.
+  also, the classes only extend the library classes, not each other.
+
+  3. TFModel Class Family
+  ======================
+  as mentioned before, the TFModel class recives all its input via one associative array at construction. calling the execute()
+  method for a model will make it dispatch the back-end logic. from there on, the object will only supply accessors.
+  the model also has a sub-class, which is specificly designed to supply access methods to model results (ModelResult).
+  as mentioned before, each model has a specific set of defiened actions, and expected paramaters. these will be listed at the 
+  beggining of each class file. 
+  also, the model defines a list of errors it might give out for invalid user-input. any invalid paramater that is not expected
+  to be from valid user-input will throw errors accordingly. 
+  
+	3.a ModelResult
+	================
+	the model result is basicly a wrapper for associative arrays. it supplies both simple getters, and also simple array handlers (for example pop)
+	and an iterator (for foreach statment). 
+  
+  4. Misc Classes
+  ================
+  the library is packged with two side-libraries. the first is a wrapper for ini files (iniObject), and the second is simply
+  a namespace for misc methods used (or not) by the system.
+  the library is also packaged with firePHP for easy development, but is by no means required.
+  
+  5. tf_autoloader and errorHandler
+  ===================================
+  last but not least, the library comes with an autoloader, which uses an external file(folder_list.txt) to find the various classes
+  and caches the results for later use. the folder-list is separated by new-lines. you must make sure this file is set up correctly for the library to work, 
+  as the classes to not have include lines. 
+  also, the package is supplied with an errorHandler, to help log and maintain errors. 
+  
+  
