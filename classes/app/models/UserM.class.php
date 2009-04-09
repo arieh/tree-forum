@@ -16,7 +16,7 @@ class UserM extends TFModel{
      * @access private
 	 * @static 
      */
-    static private $_id = 0;
+    static private $_id = 1;
 	
 	/**
 	 * @param bool whether to set the user to debug mode
@@ -42,6 +42,16 @@ class UserM extends TFModel{
      * @access protected
      */
     protected $_permission_ids = array();
+    
+    /**
+     * whether user is logged in
+     * @access public
+     * @return bool
+     * @static
+     */
+    static public function isLoggedIn(){
+    	return (self::$_id>1);
+    } 
     
     /**
      * sets the user's id
