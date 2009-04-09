@@ -53,6 +53,10 @@ class UserM extends TFModel{
     	return (self::$_id>1);
     } 
     
+    static public function logOut(){
+    	self::setId(1);
+    }
+    
     /**
      * sets the user's id
      * 	@param int $id new user id
