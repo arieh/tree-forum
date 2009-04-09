@@ -6,8 +6,14 @@ require_once('errorHandler.php');
 try{
 	NewDao::connect('mysql','localhost','root','pass','tree-forum');
 	NewDao::setLogger('fb');	
-		
-	$options= array('id'=>30,'action'=>'open','permisions'=>array(1),'debug'=>true);
+	UserM::setDebug(false);
+	UserM::setId(2);	
+	$options= array(
+		'id'=>30,
+		'action'=>'open',
+		'permisions'=>UserM::getInstance()->getPermissionIds(false),
+		'debug'=>true
+	);
 	$msgs= new MessageM($options);
 	$msgs->execute();
 	$prevDepth =0;
@@ -23,7 +29,7 @@ try{
 <?php
 while ($msg = $msgs->getMessage()):?>
 <div style = 'margin-left:<?php echo ($msg->getDepth()*15);?>px'>
-	<?php echo "ID:".$msg->getId()." :: ".$msg->getMessage()." : ".$msg->getTime();?>
+	<?php echo "ID:".$msg->getId()." :: ".$msg->getMessage()." : ".$msg->getTime()." <<>> User:".$msg->getUserName();?>
 </div>
 <?php endwhile;
 ?>
