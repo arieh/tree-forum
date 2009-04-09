@@ -1,2 +1,4 @@
 INSERT INTO `permisions` VALUES ('1', 'admin');
-INSERT INTO `forum_permisions` VALUES ('1', '0', '1', '1', '1', '1', '1', '1', '1', '1');
+INSERT INTO `permisions` VALUES ('6', 'editor');
+INSERT INTO `permisions` VALUES ('7', 'user');
+INSERT INTO `permisions` VALUES ('8', 'guest');
