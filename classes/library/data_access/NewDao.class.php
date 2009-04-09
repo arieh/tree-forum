@@ -122,6 +122,10 @@ class NewDao{
 		self::$_link = $link;
 	}
 	
+	static public function getLink(){
+		return self::$_link;
+	}
+	
 	/**
 	 * checkes wether a database connection has been established
 	 * @access public
