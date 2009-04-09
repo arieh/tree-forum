@@ -6,11 +6,12 @@ require_once('errorHandler.php');
 try{
 	NewDao::connect('mysql','localhost','root','pass','tree-forum');
 	NewDao::setLogger('fb');
-	UserM::setDebug(true);
-	UserM::setId(1);
-	print_r(UserM::getInstance()->getPermissionIds(false));	
-	echo UserM::getInstance()->getName();
-	echo UserM::getInstance()->getEmail();
+	
+	$login = new LoginM();
+	$login->execute();
+	echo $login->getKey();
+	
+	foreach ($login->getErrors() as $err) trigger_error($err);
 }catch (Exception $e){
 	trigger_error($e);
 }
