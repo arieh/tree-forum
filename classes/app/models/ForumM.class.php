@@ -31,7 +31,7 @@
  * 
  * 
  * returned object for getMessage() will have the following methods:
- * getId(), getTitle(), getTime(), getContent()
+ * getId(), getTitle(), getTime(), getContent(), getUserId(), getUserName()
  */
 
 class ForumM extends TFModel{
@@ -196,11 +196,13 @@ class ForumM extends TFModel{
     	$query = NewDao::getGenerator();
     	
     	$query->addSelect('messages',array());
-    	
     	$query->addSelect('message_contents',array());
+    	$query->addSelect('users',array('name'=>'username','id'=>'userid'));
+    	
     	$query->addSelectFunction(array("DATE_FORMAT","'%d/%m/%Y - %H:%i:%S'"),'time','messages','posted');
     	
     	$query->addInnerJoin(array('messages'=>'id'),array('message_contents'=>'message_id'));
+    	$query->addInnerJoin(array('messages'=>'user_id'),array('users'=>'id'));
     	
     	$query->addConditionSet(
     		$query->createCondition('messages','forum_id','=',$id),

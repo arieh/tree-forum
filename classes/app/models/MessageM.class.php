@@ -22,12 +22,15 @@
  * 			- getId()
  * 			- getTitle()
  * 			- getContent()
+ * 			- getUserId()
+ * 			- getUserName
  * 			- getMessage() - return a message accessor from the sub-message tree:
  * 					+ getId()
  * 					+ getTitle()
  * 					+ getMessage() returns message's content
  * 					+ getTime()
  * 					+ getUserId()
+ * 					+ getUserName()
  * + 'edit' : submmits an edited message
  * 		required:
  * 			- id (int) : message id
@@ -372,9 +375,11 @@ class MessageM extends TFModel{
 		
 		$query->addSelect('messages',array());
 		$query->addSelect('message_contents',array('title','message'));
+		$query->addSelect('users',array('name'=>'username','id'=>'userid'));
 		$query->addSelectFunction(array("DATE_FORMAT","'%d/%m/%Y - %H:%i:%S'"),'time','messages','posted');
 		
 		$query->addInnerJoin(array('messages'=>'id'),array('message_contents'=>'message_id'));
+		$query->addInnerJoin(array('messages'=>'user_id'),array('users'=>'id'));
 		
 		$query->addConditionSet(
 			$query->createCondition('messages','id','=',$id)
@@ -395,9 +400,11 @@ class MessageM extends TFModel{
 		
 		$query->addSelect('messages',array());
 		$query->addSelect('message_contents',array('title','message'));
+		$query->addSelect('users',array('name'=>'username','id'=>'userid'));
 		$query->addSelectFunction(array("DATE_FORMAT","'%d/%m/%Y - %H:%i:%S'"),'time','messages','posted');
 		
 		$query->addInnerJoin(array('messages'=>'id'),array('message_contents'=>'message_id'));
+		$query->addInnerJoin(array('messages'=>'user_id'),array('users'=>'id'));
 		
 		$query->addConditionSet(
 			//this needs to be revised. should find a way to do this without a LIKE statement
