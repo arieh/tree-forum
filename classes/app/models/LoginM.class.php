@@ -8,29 +8,15 @@ class LoginM extends TFModel{
 	
 	protected $_ini = '../configs/userAtuh.ini';
 	
-	protected $_actions = array('login','logout','generate');
+	protected $_actions = array('login'=>'login','logout'=>'logout','generate'=>'generate');
 	
 	protected $_default_action = 'generate';
-	
-	public function execute(){
-		switch ($this->getAction()){
-			case 'generate':
-				$this->generate();				
-			break;
-			case 'login':
-				$this->login();
-			break;
-			case 'logout':
-				UserM::setId(1);
-			break;
-		}
-	} 
 	
 	private function setHandler(){
 		$this->_handler = new keyHandler(NewDao::getLink(),$this->getIni());
 	}
 	
-	private function generate(){
+	protected function generate(){
 		if ($this->isOptionSet('ini')) $this->_ini = $this->getOption('ini');
 		if (!file_exists($this->getIni())){
 			$this->setError('badIni');
@@ -43,7 +29,7 @@ class LoginM extends TFModel{
 		$this->_key = $this->_handler->getKey(); 
 	}
 	
-	private function login(){
+	protected function login(){
 		if ($this->isOptionSet('ini')) $this->_ini = $this->getOption('ini');
 		if (!file_exists($this->getIni())){
 			$this->setError('badIni');
@@ -71,6 +57,10 @@ class LoginM extends TFModel{
 	private function retrieveUserId($name,$log=false){
 		$res = $this->_link->selectLCASE('users',array('id'),array('name'=>strtolower($name)),true,$log);
 		return $res['id'];
+	}
+	
+	protected function logout(){
+		UserM::setId(1);
 	}
 }
 

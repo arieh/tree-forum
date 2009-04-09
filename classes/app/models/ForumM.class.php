@@ -55,7 +55,7 @@ class ForumM extends TFModel{
 	/**
 	 * @see <Model.class.php>
 	 */
-	protected $_actions = array('open','create');
+	protected $_actions = array('open'=>'openForum','create'=>'addForum');
 	
 	/**
 	 * @param array allowed permisions for messages.
@@ -117,32 +117,11 @@ class ForumM extends TFModel{
     	return ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>$this->getId()),$log)>0);
     }
 	
-    /**
-	 * @see <Model.class.php>
-	 */
-    public function execute() {
-    	if ($this->checkPermision()==false){
-    		$this->setError('noPermision');
-    		return false;
-    	}
-    	switch ($this->getAction()){
-    		case 'open':
-				$this->openForum();    		
-    		break;
-    		case 'create':
-    			$this->addForum();
-    		break;
-    		default:
-    			throw new FormMException("no valid action was set");
-    		break;
-    	}
-    }
-    
   	/**
   	 * retrives all forum data for this action
-  	 * @access private
+  	 * @access protected
   	 */
-  	private function openForum(){
+  	protected function openForum(){
   		$this->validateForumId();
   		$id = $this->getId();
 		$start = $this->getOption('start');
@@ -262,9 +241,9 @@ class ForumM extends TFModel{
     
     /**
      * adds a forum
-     * @access private
+     * @access protected
      */
-    private function addForum(){
+    protected function addForum(){
     	$name = $this->getOption('name');
     	$desc = $this->getOption('description');
 		

@@ -59,7 +59,7 @@ class MessageM extends TFModel{
 	/**
 	 * @see <Model.class.php>
 	 */
-	protected $_actions = array('view','add','edit','move','remove');
+	protected $_actions = array('view'=>'openMessage','add'=>'addMessage','edit'=>'editMessage','move'=>'moveMessage','remove'=>'removeMessage');
 	
 	/**
 	 * @param int message id
@@ -133,27 +133,7 @@ class MessageM extends TFModel{
 	public function execute(){
 		$this->validateInputIds();
 		
-		if ($this->checkPermision()==false){
-			$this->setError('noPermision');
-			return false;
-		}
-		switch ($this->getAction()){
-			case 'add':
-				$this->addMessage();
-			break;
-			case 'view':
-				$this->openMessage();
-			break;
-			case 'edit':
-				$this->editMessage();
-			break;
-			case 'move':
-				$this->moveMessage();
-			break;
-			case 'remove':
-				$this->removeMessage();
-			break;
-		}
+		parent::execute();
 	}
 	
 	/**
@@ -201,7 +181,7 @@ class MessageM extends TFModel{
 	 * creates a message
 	 * @access private
 	 */
-	private function addMessage(){
+	protected function addMessage(){
 		/*
 		 * Input Validation:
 		 */
@@ -349,7 +329,7 @@ class MessageM extends TFModel{
 	 * opens a message
 	 * @access private
 	 */
-	private function openMessage(){
+	protected function openMessage(){
 		$this->_id = $id = $this->getId();
 		
 		$msg = $this->retrieveMessageInfo($id,$this->isDebug());
@@ -436,7 +416,7 @@ class MessageM extends TFModel{
     /**
      * submits an eddited message
      */
-    private function editMessage(){
+    protected function editMessage(){
     	$id = $this->getId();
     	if (!$id) $id = $this->_id = $this->getOption('id');
     	if (!$id || !$this->doesMessageExists($id,true)) throw new MessageMException('bad id');
@@ -467,7 +447,7 @@ class MessageM extends TFModel{
     /**
      * moves a mesage to a different tree
      */
-    private function moveMessage(){
+    protected function moveMessage(){
     	$id = $this->getId();
     	$forum = $this->getForumId();
     	$oldDna = $this->retrieveDna($id,$this->isDebug());
@@ -551,7 +531,7 @@ class MessageM extends TFModel{
      * removes a message and its siblings form the database
      * @access private
      */
-    private function removeMessage(){
+    protected function removeMessage(){
     	$id = $this->getId();
     	$dbug = $this->isDebug();
     	$dna = $this->retrieveDna($id,$dbug);

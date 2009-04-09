@@ -26,7 +26,7 @@ class TFModel{
 	protected $_errors = array();
 	
 	/**
-	 * @param array holds all legal actions for the model
+	 * @param array holds all legal actions for the model and their paired methods
 	 * @access protected
 	 */
 	protected $_actions = array();
@@ -78,7 +78,21 @@ class TFModel{
 			$this->setOption('permisions',null);
 		} 
 		$this->setAction();
+	}
+	
+	/**
+	 * executes the model's logic
+	 * @access public
+	 */	
+	public function execute(){
+		if ($this->checkPermision()==false){
+    		$this->setError('noPermision');
+    		return false;
+    	}
 		
+		if ($this->getAction()=='') return;
+		$action_method = $this->_actions[$this->getAction()];
+		$this->$action_method();
 	}
 	
 	public function __destruct(){
@@ -120,12 +134,13 @@ class TFModel{
 	 * @access protected;
 	 */
 	public function setAction($action=false){
-		if ($action && in_array($action,$this->_actions)){
+		$actions = array_keys($this->_actions);
+		if ($action && in_array($action,$actions)){
 			$this->_action = $action;
 			return;
 		}
 		if ($action = $this->getOption('action')){
-			if (in_array($action,$this->_actions)) $this->_action = $action;
+			if (in_array($action,$actions)) $this->_action = $action;
 			return;
 		}
 		$this->_action = $this->_default_action;
@@ -229,11 +244,6 @@ class TFModel{
 	 */
 	public function toJSON(){}
 
-	/**
-	 * executes the model's logic
-	 * @access public
-	 */
-	public function execute(){}
 	
 	/**
 	 * sets default getters and setters (getParamname(), setParamname())
