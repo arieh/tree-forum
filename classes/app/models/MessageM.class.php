@@ -32,6 +32,9 @@
  * 		required:
  * 			- id (int) : message id
  * 			- 'message' (string) : new content - must be longer than 2 chars
+ * 			- 'user' (int) : user id
+ * 		optional:
+ * 			-'editors-can-edit' (bool) whether or not editors and admins can edit messages
  * 		errors:
  * 			- 'shortContent' : invalid content 
  * + 'move' : moves a message from one tree to another
@@ -75,13 +78,21 @@ class MessageM extends TFModel{
 	
 	/**
 	 * @param string message title
+	 * @access private
 	 */
 	private $_title = '';
 	
 	/**
 	 * @param string message content
+	 * @access private
 	 */
 	private $_content = '';
+	
+	/**
+	 * @param bool whether or not edit shoudl be restricted to the user who submitted it or to allow editors/admin to edit as well
+	 * @access private
+	 */
+	private $_editSelfOnly = true;
 	
 	 /**
      * @see <Model.class.php>
@@ -426,9 +437,24 @@ class MessageM extends TFModel{
     	$content = $this->getOption('message');
     	if (!$content || strlen($content)<2) $this->setError('shortContent');
     	
+    	$user = $this->getOption('user-id');
+    	if ( !is_numeric($user) ) throw new MessageMException('user id is invalid');
+    	
+    	$this->_editSelfOnly = (bool)$this->getOption('editors-can-edit');
+    	
     	if ($this->isError()) return false;
     	
+    	if ($this->isUserAllowedToEdit($user,$this->_editSelfOnly,$this->isDebug()) == false){
+    		$this->setError('noPermision');
+    		return false;
+    	};
+    	
     	$this->_link->update('message_contents',array('message'=>$content,'non-html'=>strip_tags($content)),array('message_id'=>$id),$this->isDebug()); 
+    }
+    
+    private function isUserAllowedToEdit($id,$selfEdit,$log=false){
+    	if ($selfEdit==false) return true;
+    	return ($this->_link->countFields('messages',array('id'=>$this->getId(),'user_id'=>$id),$log)>0);
     }
     
     /**
