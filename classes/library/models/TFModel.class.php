@@ -68,7 +68,6 @@ class TFModel{
 		foreach ($options as $name => $value){
 			if (is_string($name)) $this->setOption($name,$value);
 		}
-		
 		if ($this->isOptionSet('debug')){
 			$this->_debug = ($this->getOption('debug')==true);
 			$this->setOption('debug',null); 
@@ -210,7 +209,7 @@ class TFModel{
 	 * @access public
 	 * @return array
 	 */
-	public function getErrors(){
+	protected function getErrors(){
 		return array_keys($this->_errors);
 	}
 	
@@ -229,7 +228,7 @@ class TFModel{
 	 * @return string
 	 */
 	public function toJSON(){}
-	
+
 	/**
 	 * executes the model's logic
 	 * @access public
