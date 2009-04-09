@@ -260,11 +260,11 @@ class TFModel{
 			&& is_array($this->$sVar)
 		);
 		
-		if (!$pVarExists && !$sVarExists) throw new ModelException("No Method Exists:".$name);
+		if (!$pVarExists && !$sVarExists) throw new TFModelException("No Method Exists:".$name);
 		
 		switch ($action){
 			case 'get':
-				$mr = (isset($args[0]) && !$args) ? false : true ;
+				$mr = (isset($args[0]) && !$args[0]) ? false : true ;
 				if ($sVarExists){
 					
 					$var = array_pop($this->$sVar);
