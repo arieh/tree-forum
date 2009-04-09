@@ -7,12 +7,18 @@ class ModelResultException extends Exception{}
  * paramaters will be accessible either as their lower-cased key name,
  * or as access functions as getParamname
  */
-class ModelResult{
+class ModelResult implements Iterator{
 	/**
 	 * @param array the array containing passed variables
 	 * @access private
 	 */
 	private $_array = array();
+	
+	private $_position = 0;
+	
+	private $_keys = array();
+	
+	private $_current = null;
 	
 	/**
 	 * a cunstructor function
@@ -23,6 +29,8 @@ class ModelResult{
 	 */
 	public function __construct($arr){
 		$this->_array = $arr;
+		$this->_keys = array_keys($arr);
+		$this->_current = current($this->_array);
 		foreach($arr as $key=>$value){
 			$key=strtolower(str_replace("-","_",$key));
 			$this->$key=$value;
@@ -75,4 +83,27 @@ class ModelResult{
 	 }
 	
 	public function __toString(){return json_encode($this);}
+	
+	public function rewind(){
+		$this->_position = 0;
+		$this->_current = reset($this->_array);
+	}
+	
+	public function current() {
+        if (is_array($this->_current)) return new ModelResult($this->_current);
+        return $this->_current;
+    }
+    
+    public function key() {
+        return $this->_keys[$this->position];
+    }
+    
+    public function next() {
+        $this->_position++;
+        $this->_current = next($this->_array);
+    }
+    
+    public function valid() {
+        return isset($this->_keys[$this->_position]);
+    }
 }
