@@ -83,7 +83,7 @@ class UserM extends TFModel{
     	}
     	if (isset($_SESSION['UserM']) && $_SESSION['UserM'] instanceof UserM) self::$_instance = $_SESSION['UserM'];
     	
-    	if (self::$_instance->getId()!=self::$_id) self::$_instance = $_SESSION['UserM'] = new UserM();
+    	if (!self::$_instance || self::$_instance->getId()!=self::$_id) self::$_instance = $_SESSION['UserM'] = new UserM();
     	else{
     		self::$_instance = $_SESSION['UserM'] = new UserM();
 		}
@@ -122,7 +122,7 @@ class UserM extends TFModel{
    	function __construct(){
 		$arr = array('debug'=>self::$_is_debug);    	
     	parent::__construct($arr);
-    	if (!$this->doesUserExist(seld::getId())) throw new UserMException('invalid user id');
+    	if (!$this->doesUserExist(self::getId())) throw new UserMException('invalid user id');
     	$this->retrieveUserInfo();
     	$this->retrievePermissionIds();
     }
@@ -145,6 +145,10 @@ class UserM extends TFModel{
     	$id = self::getId();
     	$perms = $this->_link->select('users_permisions',array('permision_id'),array('user_id'=>$id),false,$this->isDebug());
     	foreach ($perms as $per) $this->_permission_ids[]=$per['permision_id'];
+    }
+    
+    private function doesUserExist($id){
+    	return ($this->_link->countFields('users',array('id'=>$id),$this->isDebug())>0);
     }
 }
 
