@@ -14,11 +14,29 @@ class ModelResult implements Iterator{
 	 */
 	private $_array = array();
 	
+	/**
+	 * @param int current array position (used for array traversal)
+	 * @access private
+	 */
 	private $_position = 0;
 	
+	/**
+	 * @param array list of array keys  (used for array traversal)
+	 * @access private
+	 */
 	private $_keys = array();
 	
+	/**
+	 * @param mixed current array pointer  (used for array traversal)
+	 * @access private
+	 */
 	private $_current = null;
+	
+	/**
+	 * @param string name of singular form of the object's array (used to create nice synonim for pop)
+	 * @access 
+	 */
+	private $_singular = '';
 	
 	/**
 	 * a cunstructor function
@@ -27,14 +45,12 @@ class ModelResult implements Iterator{
 	 * 
 	 * @access public
 	 */
-	public function __construct($arr){
+	public function __construct($arr, $singular = false){
+		if ($singular && is_string($singular) && strlen(trim($singular))>0) $this->_singular = trim($singular);
 		$this->_array = $arr;
 		$this->_keys = array_keys($arr);
 		$this->_current = current($this->_array);
-		foreach($arr as $key=>$value){
-			$key=strtolower(str_replace("-","_",$key));
-			$this->$key=$value;
-		}
+		
 	}
 	
 	/**
@@ -52,6 +68,7 @@ class ModelResult implements Iterator{
 	public function __call($name,$pars){
 		if (substr($name,0,3)=='get'){
 			$vname = strtolower(substr($name,3));
+			if ($vname == $this->_singular) return $this->pop();
 			if (array_key_exists($vname,$this->_array)){
 				if (is_array($this->_array[$vname])) return new modelResult($this->_array[$vname]);
 				/*if (is_array($this->_array[$vname])){
@@ -82,7 +99,7 @@ class ModelResult implements Iterator{
 	 	return (is_array($var) && $MdlRslt) ? new ModelResult($var) : $var;
 	 }
 	
-	public function __toString(){return json_encode($this);}
+	public function __toString(){return json_encode($this->_array);}
 	
 	public function rewind(){
 		$this->_position = 0;
