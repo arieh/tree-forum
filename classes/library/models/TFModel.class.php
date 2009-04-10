@@ -7,6 +7,14 @@ class TFModelException extends Exception{}
  * 	- actions (string)   current action
  */
 class TFModel{
+	
+	/**
+	 * @param string class version
+	 * @access private
+	 * @static
+	 */
+	static private $_TF_MODEL_VERSION = '0.3.2';
+	
 	/**
 	 * @var NewDao a database handler object
 	 * @access protected
@@ -294,4 +302,12 @@ class TFModel{
 			break;
 		}
 	}
+	
+	/**
+	 * get the current version of TFModel
+	 * @access public
+	 * @static
+	 * @return string
+	 */
+	static public function getVersion(){return self::$_TF_MODEL_VERSION;}
 }

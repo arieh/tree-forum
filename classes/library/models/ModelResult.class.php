@@ -4,8 +4,8 @@ class ModelResultException extends Exception{}
  * this class is to be used for wrapping model reuslts from the database,
  * to be accessible as objects.
  * 
- * paramaters will be accessible either as their lower-cased key name,
- * or as access functions as getParamname
+ * paramater will be accessible through getters- for example <code>getParamName()</code>
+ * also, the class supplies normal array interface, for both foreach statement and poping / shifing
  */
 class ModelResult implements Iterator{
 	/**
@@ -41,7 +41,8 @@ class ModelResult implements Iterator{
 	/**
 	 * a cunstructor function
 	 * 
-	 * @param array $arr a 1 dimentional assotiative array
+	 * @param array  $arr       an array
+	 * @param string $singular  a singular form of the arrays name (if array is messages singular will be message)
 	 * 
 	 * @access public
 	 */
@@ -96,6 +97,16 @@ class ModelResult implements Iterator{
 	 */
 	 public function pop($MdlRslt=true){
 	 	$var = array_pop($this->_array);
+	 	return (is_array($var) && $MdlRslt) ? new ModelResult($var) : $var;
+	 }
+	 
+	 /**
+	 * shifts the last variable of the inner array
+	 * 	@param bool $MdlRslt whether to returns arrays as model results
+	 * @return mixed
+	 */
+	public function shift($MdlRslt=true){
+	 	$var = array_shift($this->_array);
 	 	return (is_array($var) && $MdlRslt) ? new ModelResult($var) : $var;
 	 }
 	
