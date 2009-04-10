@@ -27,8 +27,8 @@ try{
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head><title>bla</title></head><body>
 <?php
-$ms = $msgs->getMessages(); //this uses the ModelResult and TFModel support for plurals/singulars
-while ($msg = $ms->getMessage()):?>
+$messages = $msgs->getMessages(); //this uses the ModelResult and TFModel support for plurals/singulars
+while ($msg = $messages->getMessage()):?>
 <div style = 'margin-left:<?php echo ($msg->getDepth()*15);?>px'>
 	<?php echo "ID:".$msg->getId()." :: ".$msg->getMessage()." : ".$msg->getTime()." <<>> User:".$msg->getUserName();?>
 </div>
