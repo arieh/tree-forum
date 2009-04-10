@@ -53,12 +53,15 @@ class UserM extends TFModel{
     	return (self::$_id>1);
     } 
     
+    /**
+     * logs the user out
+     */
     static public function logOut(){
     	self::setId(1);
     }
     
     /**
-     * sets the user's id
+     * sets the user's id. if an instance exists resets it.
      * 	@param int $id new user id
      * @access public
      * @static
@@ -66,8 +69,18 @@ class UserM extends TFModel{
     static public function setId($id){
     	if (self::$_id != $id){
     		self::$_id = $id;
-    		if (self::$_instance) self::$_instance = $_SESSION['UserM'] = new UserM();
+    		if (self::$_instance) self::$_instance = $_SESSION['UserM'] = null;
     	}
+    }
+    
+    /**
+     * returns user id
+     * @access public
+     * @return int 
+     * @static
+     */
+    static public function getId(){
+    	return self::$_id;
     }
     
     /**
@@ -96,7 +109,7 @@ class UserM extends TFModel{
     }
     
     /**
-     * sets debug mode
+     * sets debug mode. if debug mode changes resets instance.
      * 	@param bool $on whether to turn on debug mode or not
      * @access public
      * @static
@@ -104,20 +117,9 @@ class UserM extends TFModel{
     static public function setDebug($on=false){
     	if (self::$_is_debug != (bool) $on){
     		self::$_is_debug = (bool) $on;
-    		self::$_instance = $_SESSION['UserM'] = new UserM();
+    		self::$_instance = $_SESSION['UserM'] = null;
     	}
     }
-    
-    /**
-     * returns user id
-     * @access public
-     * @return int 
-     * @static
-     */
-    static public function getId(){
-    	return self::$_id;
-    }
-    
     
     /**
      * constructor for the class
