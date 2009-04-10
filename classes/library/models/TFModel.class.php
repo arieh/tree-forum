@@ -190,6 +190,12 @@ class TFModel{
 	 protected function doesHavePermisions(){
 	 	return (count($this->_permisions)>0);
 	 }
+	 
+	/**
+	 * checks if a specific user has permision to access the page
+	 * @return bool
+	 */
+	protected function checkPermision(){return true;}
 	
 	/**
 	 * sets an internal error
@@ -208,12 +214,6 @@ class TFModel{
 	protected function unsetError($name){
 		if (isset($this->_errors[$name])) unset($this->_errors[$name]);
 	}
-	
-	/**
-	 * checks if a specific user has permision to access the page
-	 * @return bool
-	 */
-	protected function checkPermision(){return true;}
 	
 	/**
 	 * checks if an error exists for the model. 
@@ -250,7 +250,7 @@ class TFModel{
 	 * @access public
 	 * @return string
 	 */
-	public function toJSON(){}
+	public function toJSON(){return '{}';}
 
 	
 	/**
@@ -292,13 +292,6 @@ class TFModel{
 				}
 				$singular = (substr($pVar,-1)=='s') ? substr($pVar,1,(strlen($pVar)-2)) : $pVar;
 				return (is_array($this->$pVar) && $mr) ? new ModelResult($this->$pVar,$singular) : $this->$pVar;
-			break;
-			case 'set':
-				if ($sVarExists){
-					foreach ($args as $arg) array_push($this->$sVar,$arg);	
-					return true;
-				}
-				$this->$pVar = $args[0];
 			break;
 		}
 	}
