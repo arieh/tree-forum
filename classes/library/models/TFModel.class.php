@@ -282,7 +282,7 @@ class TFModel{
 					}
 					return false;
 				}
-				$singular = (substr($pVar,-1)=='s') ? substr($pVar,0,(strlen($pVar)-1)) : $pVar;
+				$singular = (substr($pVar,-1)=='s') ? substr($pVar,1,(strlen($pVar)-1)) : $pVar;
 				return (is_array($this->$pVar) && $mr) ? new ModelResult($this->$pVar,$singular) : $this->$pVar;
 			break;
 			case 'set':
