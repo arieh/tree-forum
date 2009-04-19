@@ -61,4 +61,43 @@ function TF_Error_Handler($errno,$str,$file,$line){
   	fclose($log);
 }
 
+function TF_Exception_Handler($ex){
+	
+	$stack = $ex->getTrace();	
+	
+	$error = "Uncaught-Exception: <<<[ "
+			.$ex->getMessage()." ]>>>\n"
+			."On Line: {$ex->getLine()} "
+			."On File: {$ex->getFile()} "
+			."\n";
+
+	if (function_exists('fb')){
+		fb($error);
+	}
+	
+	
+  		$stackstr = '';
+  		$sep = '>> ';
+  		$tabs = "\n";
+  		
+  		while ($ins = array_pop($stack)){
+  			$stackstr .=$tabs.$sep;
+  			if (isset($ins['class'])) $stackstr.=$ins['class'].$ins['type'];
+  			if (isset($ins['function'])){
+  				$stackstr .= $ins['function'].'()';
+  				$stackstr .=" On line ".$ins['line'];
+  				$stackstr .=" In file ".$ins['file'];
+  			} 
+  			$tabs.="\t";
+  		}
+  	if (file_exists('errors.log')){
+  		$log = fopen('errors.log','w');
+  	}else{
+  		$log = fopen('errors.log','x+');
+  	}
+  	fwrite($log,$error."Stack:\n".$stackstr."\n");
+  	fclose($log);
+}
+
 set_error_handler("TF_Error_Handler");
+set_exception_handler("TF_Exception_Handler");

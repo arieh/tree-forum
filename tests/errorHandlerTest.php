@@ -14,9 +14,5 @@ function c(){
 	throw new Exception('a');
 }
 
-try{
-	a();
-}catch (Exception $e){
-	trigger_error($e);
-}
+a();
 ?>

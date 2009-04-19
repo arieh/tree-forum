@@ -3,7 +3,7 @@ define('_SEP_',DIRECTORY_SEPARATOR);
 require_once('autoloader.php');
 require_once('..'._SEP_.'classes'._SEP_.'library'._SEP_.'firePHP'._SEP_.'fb.php');
 require_once('errorHandler.php');
-try{
+	
 	NewDao::connect('mysql','localhost','root','pass','tree-forum');
 	NewDao::setLogger('fb');	
 		
@@ -21,7 +21,4 @@ try{
 	$message = new MessageM($options);
 	$message->execute();
 	foreach ($message->getErrors() as $err) echo "$err<br>";
-}catch (Exception $e){
-	trigger_error($e);
-}
 ?>
