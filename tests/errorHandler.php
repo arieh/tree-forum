@@ -3,7 +3,7 @@ function TF_Error_Handler($errno,$str,$file,$line){
 	
 		$stack = debug_backtrace();	
 	
-	$error = "ERROR: "
+	$error = "\nERROR: "
 			.$str." \n"
 			."On Line: $line "
 			."On File: $file "
@@ -53,11 +53,11 @@ function TF_Error_Handler($errno,$str,$file,$line){
   			$tabs.="\t";
   		}
   	if (file_exists('errors.log')){
-  		$log = fopen('errors.log','w');
+  		$log = fopen('errors.log','a');
   	}else{
-  		$log = fopen('errors.log','x+');
+  		$log = fopen('errors.log','a+');
   	}
-  	fwrite($log,$error."Stack:\n".$stackstr."\n");
+  	fwrite($log,$error."Stack:\n".$stackstr."\n=======================================\n");
   	fclose($log);
 }
 
@@ -65,7 +65,7 @@ function TF_Exception_Handler($ex){
 	
 	$stack = $ex->getTrace();	
 	
-	$error = "Uncaught-Exception: <<<[ "
+	$error = "\nUncaught-Exception: <<<[ "
 			.$ex->getMessage()." ]>>>\n"
 			."On Line: {$ex->getLine()} "
 			."On File: {$ex->getFile()} "
@@ -91,11 +91,11 @@ function TF_Exception_Handler($ex){
   			$tabs.="\t";
   		}
   	if (file_exists('errors.log')){
-  		$log = fopen('errors.log','w');
+  		$log = fopen('errors.log','a');
   	}else{
-  		$log = fopen('errors.log','x+');
+  		$log = fopen('errors.log','a+');
   	}
-  	fwrite($log,$error."Stack:\n".$stackstr."\n");
+  	fwrite($log,$error."Stack:\n".$stackstr."\n=======================================\n");
   	fclose($log);
 }
 
