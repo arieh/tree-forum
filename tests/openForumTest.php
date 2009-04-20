@@ -6,12 +6,12 @@ require_once('errorHandler.php');
 	
 	NewDao::connect('mysql','localhost','root','rjntqvzz','tree-forum');
 	NewDao::setLogger('fb');	
-	UserM::setId(1);
+	TFUser::setId(1);
 	$options= array(
 		'id'=>1,
 		'start'=>0,
 		'limit'=>10,
-		'permisions'=>UserM::getInstance()->getPermissions(false),
+		'permisions'=>TFUser::getInstance()->getPermissions(false),
 		'debug'=>true
 	);
 	$forum= new ForumM($options);

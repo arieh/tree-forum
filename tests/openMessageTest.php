@@ -6,12 +6,12 @@ require_once('errorHandler.php');
 
 	NewDao::connect('mysql','localhost','root','pass','tree-forum');
 	NewDao::setLogger('fb');	
-	UserM::setDebug(false);
-	UserM::setId(2);	
+	TFUser::setDebug(false);
+	TFUser::setId(2);	
 	$options= array(
 		'id'=>30,
 		'action'=>'open',
-		'permisions'=>UserM::getInstance()->getPermissionIds(false),
+		'permisions'=>TFUser::getInstance()->getPermissionIds(false),
 		'debug'=>true
 	);
 	$msgs= new MessageM($options);

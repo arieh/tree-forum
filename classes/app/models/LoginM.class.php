@@ -26,7 +26,7 @@
 /**
  * this class is a wrapper for the userAtuh library. 
  * 
- * this class is ment to bridge between UserM and the userAtuh library. this is important to notice,
+ * this class is ment to bridge between TFUser and the userAtuh library. this is important to notice,
  * as it is dependant on them both to function.
  */
 class LoginM extends TFModel{
@@ -104,7 +104,7 @@ class LoginM extends TFModel{
 		if ($this->isError()) return;
 		
 		if ($this->_handler->authenticate($name,$hash,$encoded)){
-			UserM::setId($this->retrieveUserId($name,$this->isDebug()));
+			TFUser::setId($this->retrieveUserId($name,$this->isDebug()));
 		}else $this->setError('badMatch');
 	}   
 	
@@ -135,7 +135,7 @@ class LoginM extends TFModel{
 	 * logout the user
 	 */
 	protected function logout(){
-		UserM::logOut();
+		TFUser::logOut();
 	}
 }
 

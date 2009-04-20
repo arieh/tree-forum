@@ -6,9 +6,9 @@ require_once('errorHandler.php');
 	
 	NewDao::connect('mysql','localhost','root','pass','tree-forum');
 	NewDao::setLogger('fb');
-	UserM::setDebug(true);
-	UserM::setId(1);
-	print_r(UserM::getInstance()->getPermissionIds(false));	
-	echo UserM::getInstance()->getName();
-	echo UserM::getInstance()->getEmail();
+	TFUser::setDebug(true);
+	TFUser::setId(1);
+	print_r(TFUser::getInstance()->getPermissionIds(false));	
+	echo TFUser::getInstance()->getName();
+	echo TFUser::getInstance()->getEmail();
 ?>

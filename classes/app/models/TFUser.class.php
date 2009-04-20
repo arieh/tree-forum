@@ -2,10 +2,10 @@
 /**
  * this class handles the basic user operations for this library. 
  */
-class UserM extends TFModel{
+class TFUser extends TFModel{
 	
 	/**
-	 * @param UserM a sigelton for the user
+	 * @param TFUser a sigelton for the user
 	 * @access private
 	 * @static
 	 */
@@ -69,7 +69,7 @@ class UserM extends TFModel{
     static public function setId($id){
     	if (self::$_id != $id){
     		self::$_id = $id;
-    		if (self::$_instance) self::$_instance = $_SESSION['UserM'] = null;
+    		if (self::$_instance) self::$_instance = $_SESSION['TFUser'] = null;
     	}
     }
     
@@ -86,11 +86,11 @@ class UserM extends TFModel{
     /**
      * a factory method for singelton pattern
      * @access public
-     * @return UserM
+     * @return TFUser
      * @static
      */
     static public function getInstance(){
-    	if (self::$_instance instanceof UserM){
+    	if (self::$_instance instanceof TFUser){
     		return self::$_instance;
     	}
     	
@@ -98,11 +98,11 @@ class UserM extends TFModel{
     		session_start();
     		session_regenerate_id();
     	}
-    	if (isset($_SESSION['UserM']) && $_SESSION['UserM'] instanceof UserM) self::$_instance = $_SESSION['UserM'];
+    	if (isset($_SESSION['TFUser']) && $_SESSION['TFUser'] instanceof TFUser) self::$_instance = $_SESSION['TFUser'];
     	
-    	if (!self::$_instance || self::$_instance->getId()!=self::$_id) self::$_instance = $_SESSION['UserM'] = new UserM();
+    	if (!self::$_instance || self::$_instance->getId()!=self::$_id) self::$_instance = $_SESSION['TFUser'] = new TFUser();
     	else{
-    		self::$_instance = $_SESSION['UserM'] = new UserM();
+    		self::$_instance = $_SESSION['TFUser'] = new TFUser();
 		}
     	
     	return self::$_instance;
@@ -117,7 +117,7 @@ class UserM extends TFModel{
     static public function setDebug($on=false){
     	if (self::$_is_debug != (bool) $on){
     		self::$_is_debug = (bool) $on;
-    		self::$_instance = $_SESSION['UserM'] = null;
+    		self::$_instance = $_SESSION['TFUser'] = null;
     	}
     }
     
@@ -128,7 +128,7 @@ class UserM extends TFModel{
    	function __construct(){
 		$arr = array('debug'=>self::$_is_debug);    	
     	parent::__construct($arr);
-    	if (!$this->doesUserExist(self::getId())) throw new UserMException('invalid user id');
+    	if (!$this->doesUserExist(self::getId())) throw new TFUserException('invalid user id');
     	$this->retrieveUserInfo();
     	$this->retrievePermissionIds();
     }
@@ -158,5 +158,5 @@ class UserM extends TFModel{
     }
 }
 
-class UserMException extends TFModelException{}
+class TFUserException extends TFModelException{}
 ?>

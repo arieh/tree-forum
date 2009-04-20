@@ -6,14 +6,14 @@ require_once('errorHandler.php');
 	
 	NewDao::connect('mysql','localhost','root','pass','tree-forum');
 	NewDao::setLogger('fb');	
-	UserM::setId(1);	
+	TFUser::setId(1);	
 	$options= array(
 		'action'=>'edit',
 		'message'=>'an eddited message',
 		'id'=>9,
 		'permisions'=>array(1),
 		'debug'=>true,
-		'user'=>UserM::getId()
+		'user'=>TFUser::getId()
 	);
 	$message = new MessageM($options);
 	$message->execute();
