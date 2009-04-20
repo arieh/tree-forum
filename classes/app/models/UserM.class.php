@@ -10,7 +10,11 @@ class UserM extends TFModel{
 	
 	protected $_email = '';
 	
-	protected $uid = '';
+	protected $_uid = '';
+	
+	protected $_message_ids = array();
+	
+	private $_message_limit = 10;
 	
 	protected function checkPermision(){
 		$perms = $this->getPermisions(false);
@@ -109,6 +113,49 @@ class UserM extends TFModel{
 		foreach ($perms as $perm){
 			$ins->insert('users_permisions',array('user_id'=>$id,'permision_id'=>$perm),$log);
 		}
+	}
+	
+	
+	protected function openUser(){
+		$dbug = $this->isDebug();
+		$this->_id = $id = $this->getOption('id');
+		
+		if (!$id || !$this->doesUserExists($id,$dbug)) $this->setError('badId');
+		
+		if ($this->isError()) return false;
+		
+		$user = $this->retrieveUserInfo($id,$dbug);
+		$this->_name = $user['name'];
+		$this->_email = $user['email'];
+		
+		$this->_message_ids = $this->retrieveMessageIds($id,$dbug); 
+	}
+	
+	private function doesUserExists($id,$log=false){
+		return (
+			NewDao::getInstance()
+			->countFields('users',array('id'=>$id),$log)>0
+		);
+	}
+	
+	private function retrieveUserInfo($id,$log=false){
+		return (
+			NewDao::getInstance()
+			->select('users',array('name','email'),array('id'=>$id),true,$log)
+		);
+	}
+	
+	private function retrieveMessageIds($id,$log=false){
+		$query = NewDao::getGenerator();
+		
+		$sql = 
+		$query
+		->addSelect('messages',array('id'))
+		->limit($this->_message_limit)
+		->addConditionSet( $query->createCondition('messages','user_id','=',$id) )
+		->generate();
+		
+		return NewDao::getInstance()->queryArray($sql,$log);		
 	}
 }
 
