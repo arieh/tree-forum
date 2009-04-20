@@ -83,10 +83,19 @@ function TF_Exception_Handler($ex){
   		while ($ins = array_pop($stack)){
   			$stackstr .=$tabs.$sep;
   			if (isset($ins['class'])) $stackstr.=$ins['class'].$ins['type'];
-  			if (isset($ins['function'])){
+  			if (isset($ins['function']) && isset($ins['file'])){
   				$stackstr .= $ins['function'].'()';
   				$stackstr .=" On line ".$ins['line'];
   				$stackstr .=" In file ".$ins['file'];
+  			}elseif (isset($ins['function']) && isset($ins['class'])){
+  				$stackstr .= $ins['function']. "(";
+  				$sep ='';
+  				
+  				foreach ($ins['args'] as $arg){
+  					$stackstr.=$sep . $arg;
+  					$sep = ','; 	
+  				} 
+  				$stackstr .= ')';
   			} 
   			$tabs.="\t";
   		}
