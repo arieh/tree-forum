@@ -276,7 +276,6 @@ class TFModel{
 			(isset($this->$sVar) || property_exists($this,$sVar)) 
 			&& is_array($this->$sVar)
 		);
-		
 		if (!$pVarExists && !$sVarExists) throw new TFModelException("No Method Exists:".$name);
 		
 		switch ($action){

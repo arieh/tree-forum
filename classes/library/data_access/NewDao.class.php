@@ -296,7 +296,7 @@ class NewDao{
 		
 		$query->addConditionSet($arr);
 		
-		$query->addSelectFunction('COUNT','c',$table,$c);
+		$query->addSelectFunction('COUNT','c',$table,$f);
 		$res = $this->queryArray($query->generate(),$log);
 		return $res[0]['c'];
 	}
@@ -311,10 +311,12 @@ class NewDao{
 	 */
 	public function countFieldsLCASE($table,$conditions,$log=false){
 		$query = self::getGenerator();
-		$query->addSelectFunction('COUNT','c',$table);
+		$f='*';
 		foreach($conditions as $c=>$v){
+			if ($f=='*') $f = $c; 
 			$arr[] = $query->createCondition($table,$c,"=",$v,'LCASE');
 		}
+		$query->addSelectFunction('COUNT','c',$table,$f);
 		$query->addConditionSet($arr);
 		$res = $this->query($query->generate(),$log);
 		$result = $res->fetch_assoc();
