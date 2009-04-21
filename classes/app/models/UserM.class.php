@@ -1,21 +1,53 @@
 <?php
 class UserM extends TFModel{
-	protected $_actions = array('create'=>'createUser','open'=>'openUser','add-permission'=>'addPermission','remove-permission'=>'removePermission');
 	
+	/**
+	 * @see <TFModel.class.php>
+	 */
+	protected $_actions = array('create'=>'createUser','open'=>'openUser'/*,'add-permission'=>'addPermission','remove-permission'=>'removePermission'*/);
+	
+	/**
+	 * @see <TFModel.class.php>
+	 */
 	protected $_default_action = 'open';
 	
+	/**
+	 * @param int user id
+	 * @access protected
+	 */
 	protected $_id = 1;
 	
+	/**
+	 * @param string user name
+	 * @access protected
+	 */
 	protected $_name = '';
 	
+	/**
+	 * @param string user email
+	 * @access protected
+	 */
 	protected $_email = '';
 	
+	/**
+	 * @param string user's uniq id
+	 * @access protected 
+	 */
 	protected $_uid = '';
 	
+	/**
+	 * @param array a list of message ids posted by the user
+	 */
 	protected $_message_ids = array();
 	
+	/**
+	 * @param int number of messages to retrieve from the database
+	 */
 	private $_message_limit = 10;
 	
+	/**
+	 * @see <TFModel.class.php>
+	 */
 	protected function checkPermision(){
 		$perms = $this->getPermisions(false);
 		$action = $this->getAction();
@@ -28,10 +60,25 @@ class UserM extends TFModel{
 		return false;
 	}
 	
+	/**
+	 * checks if a specific permission is an admin permission
+	 * 	@param int $perm permission id
+	 * 	@param bool $log log queries?
+	 * @access private
+	 * @return bool
+	 */
 	private function isAdmin($perm,$log=false){
 		return ($perm==1);
 	}
 	
+	/**
+	 * checks if a specific pair of permission and action is allowed
+	 * 	@param string $action action name
+	 * 	@param int    $perm   permission id
+	 * 	@param book   $log    log queries?
+	 * @access private
+	 * @return bool
+	 */
 	private function doesHavePermission($action,$perm,$log=false){
 		switch($action){
 			case 'create':
@@ -46,6 +93,9 @@ class UserM extends TFModel{
 					->countFields($table,array('permision_id'=>$perm,$action=>1),$log)>0);
 	}
 	
+	/**
+	 * a main action method for user creation
+	 */
 	protected function createUser(){
 		$dbug = $this->isDebug();
 		
@@ -61,6 +111,8 @@ class UserM extends TFModel{
 		if (!is_string($pass)) $this->setError('badPass');
 		if ($this->isValidEmail($email)==false) $this->setError('badEmail');
 		
+		foreach ($permissions as $permission) if ($this->doesPermissionExists($permission)==false) $this->setError('badPermission');
+		
 		if ($this->isError()) return false;
 		
 		if ($encrypt) $pass = sha1($pass);
@@ -73,41 +125,91 @@ class UserM extends TFModel{
 		
 	}
 	
+	/**
+	 * checks if a specific name is already taken
+	 * 	@param string $name user name
+	 * 	@param bool $log log queries?
+	 * @access private
+	 * @return bool
+	 */
 	private function isNameTaken($name,$log=false){
 		return (NewDao::getInstance()
 				->countFieldsLCASE('users',array('name'=>strtolower($name)),$log)>0
 		);
 	}
 	
+	/**
+	 * checks if a given email is valid
+	 * 	@param string $email an email address
+	 * @access private
+	 * @return bool
+	 * 
+	 * @todo provide a simple email validation
+	 * @todo provide a full email check (not only valid but exists) 
+	 */
 	private function isValidEmail($email){
-		/*$chars = "/[a-zA-Z0-9_-.]+@[a-zA-Z0-9-]+.[.a-zA-Z]+/i";
-		if(strstr($email, '@') && strstr($email, '.')) {
-			if (preg_match($chars, $email)) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}*/
 		return true;
 	}
 	
+	/**
+	 * checks if a given permission exists
+	 * 	@param int $perm permission id
+	 * 	@param bool $log log queries?
+	 * @access private
+	 * @return bool
+	 */
+	private function doesPermissionExists($perm,$log=false){
+		return(
+			NewDao::getInstance()
+			->countFields('permissions',array('id'=>$perm),$log)>0
+		);
+	}
+	
+	
+	/**
+	 * generates a uniq id for the user
+	 * @access private
+	 * @return string
+	 */
 	private function generateUid(){
 		return sha1(uniqid(substr(sha1($this->getName() . rand()) ,10) , true ));
 	}
 	
+	/**
+	 * checks if a given uid is already taken
+	 * 	@param string $uid a uniq id to check for
+	 * 	@param bool   $log log queries?
+	 * @access private
+	 * @return bool
+	 */
 	private function doesUidExists($uid,$log=false){
 		return (NewDao::getInstance()
 				->countFields('users',array('uid'=>$uid),$log)>0
 		);
 	}
 	
+	/**
+	 * posts the user's info to the db
+	 * 	@param string $name user name
+	 * 	@param string $pass user password
+	 * 	@param string $email user email
+	 * 	@param string $uid  user's uniq id
+	 * 	@param bool $log log queries?
+	 * @access private
+	 * @return int new user's id
+	 */
 	private function postUser($name,$pass,$email,$uid,$log=false){
 		NewDao::getInstance()->insert('users',array('name'=>$name,'password'=>$pass,'email'=>$email,'uid'=>$uid),$log);
 		return NewDao::getInstance()->getLastId();
 	}
 	
+	/**
+	 * sets new permissions to a user
+	 * 	@param int $id user id
+	 * 	@param int $perm permission id
+	 * 	@param bool $log log queries?
+	 * @access private
+	 */
 	private function setPermissions($id,$perms,$log=false){
 		$ins = NewDao::getInstance();
 		foreach ($perms as $perm){
@@ -115,36 +217,97 @@ class UserM extends TFModel{
 		}
 	}
 	
-	
+	/**
+	 * opens a user
+	 */
 	protected function openUser(){
 		$dbug = $this->isDebug();
 		$this->_id = $id = $this->getOption('id');
+		if (!$id){
+			$name = $this->_name = $this->getOption('name');
+			if (!$name) $this->setError('noId');
+			elseif ($this->doesUserExists($name,$dbug)) $id = $this->_id = $this->retrieveUserId($name,$dbug);
+			else $this->setError('noId');
+		}else{
+			if (!$this->doesUserExists($id,$dbug)) $this->setError('badId');
+			else $this->_name = $name = $this->retrieveUserName($id,$dbug);
+		} 
 		
 		if (!$id || !$this->doesUserExists($id,$dbug)) $this->setError('badId');
 		
 		if ($this->isError()) return false;
 		
-		$user = $this->retrieveUserInfo($id,$dbug);
-		$this->_name = $user['name'];
-		$this->_email = $user['email'];
+		$this->_email = $this->retrieveUserEmail($this->getId(),$dbug);
 		
 		$this->_message_ids = $this->retrieveMessageIds($id,$dbug); 
 	}
 	
-	private function doesUserExists($id,$log=false){
-		return (
-			NewDao::getInstance()
-			->countFields('users',array('id'=>$id),$log)>0
-		);
+	/**
+	 * checks if a user exists by id/name
+	 * 	@param int|string $value user id|name
+	 * 	@param bool $log log queries?
+	 * @access private
+	 * @return bool
+	 */
+	private function doesUserExists($value,$log=false){
+		if (is_numeric($value)){
+			return (
+				NewDao::getInstance()
+				->countFields('users',array('id'=>$value),$log)>0
+			);	
+		}
+		return(
+		 	NewDao::getInstance()
+		 	->countFieldsLCASE('users',array('name'=>strtolower($value)),$log)>0
+		);		
 	}
 	
-	private function retrieveUserInfo($id,$log=false){
-		return (
-			NewDao::getInstance()
-			->select('users',array('name','email'),array('id'=>$id),true,$log)
-		);
+	/**
+	 * returns a users id by his name
+	 * 	@param string $name user name
+	 * 	@param bool $log
+	 * @access private
+	 * @return int
+	 */
+	private function retrieveUserId($name,$log=false){
+		$res = 	NewDao::getInstance()
+				->selectLCASE('users',array('id'),array('name'=>strtolower($name)),true,$log);
+		return $res['id'];
 	}
 	
+	/**
+	 * returns a user name by his id
+	 * 	@param int $id user id
+	 * 	@param bool $log
+	 * @access private
+	 * @return string
+	 */
+	private function retrieveUserName($id,$log=false){
+		$res = NewDao::getInstance()
+				->select('users',array('name'),array('id'=>$id),true,$log);
+		return $res['name'];
+	}
+	
+	/**
+	 * returns a user email by his id
+	 * 	@param int $id
+	 * 	@param bool $log
+	 * @access private
+	 * @return string
+	 */
+	private function retrieveUserEmail($id,$log=false){
+		$res = NewDao::getInstance()
+				->select('users',array('email'),array('id'=>$id),true,$log);
+		return $res['email'];
+	}
+	
+	/**
+	 * returns a list of ids of messages posted by a user
+	 * 	@param int $id
+	 * 	@param bool $log
+	 * @access private
+	 * @return array list of message ids
+	 */
 	private function retrieveMessageIds($id,$log=false){
 		$query = NewDao::getGenerator();
 		
