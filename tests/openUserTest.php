@@ -4,14 +4,14 @@ require_once('autoloader.php');
 require_once('..'._SEP_.'classes'._SEP_.'library'._SEP_.'firePHP'._SEP_.'fb.php');
 require_once('errorHandler.php');
 	
-	NewDao::connect('mysql','localhost','root','pas','treeforum');
+	NewDao::connect('mysql','localhost','root','pass','treeforum');
 	NewDao::setLogger('fb');	
 	TFUser::setId(2);
 	
 	$options = array(
 		'action'=>'open',
 		'permisions'=>TFUser::getInstance()->getPermissionIds(),
-		'id'=>2,
+		'name'=>'arieh',
 		'debug'=>true
 	);
 	
