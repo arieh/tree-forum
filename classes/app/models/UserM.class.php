@@ -111,7 +111,7 @@ class UserM extends TFModel{
 		if (!is_string($pass)) $this->setError('badPass');
 		if ($this->isValidEmail($email)==false) $this->setError('badEmail');
 		
-		foreach ($permissions as $permission) if ($this->doesPermissionExists($permission)==false) $this->setError('badPermission');
+		foreach ($permissions as $permission) if ($this->doesPermissionExists($permission)==false) throw new UserMException('badPermission');
 		
 		if ($this->isError()) return false;
 		
@@ -236,7 +236,6 @@ class UserM extends TFModel{
 		if (!$id || !$this->doesUserExists($id,$dbug)) $this->setError('badId');
 		
 		if ($this->isError()) return false;
-		
 		$this->_email = $this->retrieveUserEmail($this->getId(),$dbug);
 		
 		$this->_message_ids = $this->retrieveMessageIds($id,$dbug); 
