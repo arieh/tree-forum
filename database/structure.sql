@@ -1,30 +1,22 @@
-/*
-MySQL Data Transfer
-Source Host: 192.168.2.104
-Source Database: tree-forum
-Target Host: 192.168.2.104
-Target Database: tree-forum
-Date: 09/04/2009 20:48:47
-*/
-
 SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 -- Table structure for forum_permisions
 -- ----------------------------
 DROP TABLE IF EXISTS `forum_permisions`;
 CREATE TABLE `forum_permisions` (
-  `permision_id` int(10) unsigned default NULL,
+  `permision_id` int(10) unsigned NOT NULL DEFAULT '0',
   `forum_id` int(10) unsigned NOT NULL,
-  `open` tinyint(1) NOT NULL default '0',
-  `add` tinyint(1) NOT NULL default '0',
-  `delete` tinyint(1) NOT NULL default '0',
-  `view` tinyint(1) NOT NULL default '0',
-  `edit` tinyint(1) NOT NULL default '0',
-  `create` tinyint(1) NOT NULL default '0',
-  `remove` tinyint(1) NOT NULL default '0',
-  `move` tinyint(1) NOT NULL default '0',
-  `add-permision` tinyint(1) default '0',
-  `restrict` tinyint(1) default '0',
+  `open` tinyint(1) NOT NULL DEFAULT '0',
+  `add` tinyint(1) NOT NULL DEFAULT '0',
+  `delete` tinyint(1) NOT NULL DEFAULT '0',
+  `view` tinyint(1) NOT NULL DEFAULT '0',
+  `edit` tinyint(1) NOT NULL DEFAULT '0',
+  `create` tinyint(1) NOT NULL DEFAULT '0',
+  `remove` tinyint(1) NOT NULL DEFAULT '0',
+  `move` tinyint(1) NOT NULL DEFAULT '0',
+  `add-permision` tinyint(1) DEFAULT '0',
+  `restrict` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`permision_id`),
   KEY `permision_id` (`permision_id`),
   CONSTRAINT `forum_permisions_ibfk_3` FOREIGN KEY (`permision_id`) REFERENCES `permisions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -34,10 +26,10 @@ CREATE TABLE `forum_permisions` (
 -- ----------------------------
 DROP TABLE IF EXISTS `forums`;
 CREATE TABLE `forums` (
-  `id` int(10) unsigned NOT NULL auto_increment,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `description` varchar(255) NOT NULL,
   `name` varchar(45) NOT NULL,
-  PRIMARY KEY  (`id`),
+  PRIMARY KEY (`id`),
   UNIQUE KEY `message_id` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
 
@@ -46,11 +38,11 @@ CREATE TABLE `forums` (
 -- ----------------------------
 DROP TABLE IF EXISTS `message_contents`;
 CREATE TABLE `message_contents` (
-  `title` varchar(255) default NULL,
+  `title` varchar(255) DEFAULT NULL,
   `message` text,
   `non-html` text,
-  `message_id` int(11) NOT NULL default '0',
-  PRIMARY KEY  (`message_id`)
+  `message_id` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`message_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -58,15 +50,15 @@ CREATE TABLE `message_contents` (
 -- ----------------------------
 DROP TABLE IF EXISTS `messages`;
 CREATE TABLE `messages` (
-  `id` int(10) unsigned NOT NULL auto_increment,
-  `dna` varchar(255) collate utf8_bin NOT NULL default '',
-  `base` tinyint(1) NOT NULL default '0',
-  `root_id` int(10) unsigned default NULL,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `dna` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
+  `base` tinyint(1) NOT NULL DEFAULT '0',
+  `root_id` int(10) unsigned DEFAULT NULL,
   `forum_id` int(10) unsigned NOT NULL,
-  `posted` timestamp NULL default NULL,
-  `user_id` int(11) default '0',
-  `last_update` timestamp NULL default NULL on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`id`,`dna`),
+  `posted` timestamp NULL DEFAULT NULL,
+  `user_id` int(11) DEFAULT '0',
+  `last_update` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`,`dna`),
   UNIQUE KEY `id` (`id`),
   KEY `forum_id` (`forum_id`),
   KEY `root_id` (`root_id`),
@@ -80,9 +72,9 @@ CREATE TABLE `messages` (
 -- ----------------------------
 DROP TABLE IF EXISTS `permisions`;
 CREATE TABLE `permisions` (
-  `id` int(10) unsigned NOT NULL auto_increment,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
-  PRIMARY KEY  (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -90,23 +82,37 @@ CREATE TABLE `permisions` (
 -- ----------------------------
 DROP TABLE IF EXISTS `temp-keys`;
 CREATE TABLE `temp-keys` (
-  `ip` varchar(255) collate utf8_bin NOT NULL default '',
-  `key` varchar(255) collate utf8_bin default NULL,
-  PRIMARY KEY  (`ip`),
+  `ip` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
+  `key` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  PRIMARY KEY (`ip`),
   UNIQUE KEY `ip` (`ip`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Table structure for user_permissions
+-- ----------------------------
+DROP TABLE IF EXISTS `user_permissions`;
+CREATE TABLE `user_permissions` (
+  `permission_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `open` tinyint(1) DEFAULT '0',
+  `create` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`permission_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Table structure for users
 -- ----------------------------
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
-  `id` int(10) unsigned NOT NULL auto_increment,
-  `name` varchar(255) default NULL,
-  `email` varchar(255) default NULL,
-  `password` varchar(255) default NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `password` varchar(255) NOT NULL,
+  `uid` varchar(40) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id` (`id`),
+  UNIQUE KEY `uid` (`uid`,`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for users_permisions

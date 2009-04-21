@@ -17,11 +17,9 @@ INSERT INTO `messages` VALUES ('34', '31.34', '0', '31', '1', '2009-04-04 12:50:
 INSERT INTO `messages` VALUES ('35', '32.35', '0', '32', '1', '2009-04-04 12:50:13', '2', '2009-04-04 12:50:13');
 INSERT INTO `messages` VALUES ('36', '30.33.36', '0', '30', '1', '2009-04-04 12:50:50', '2', '2009-04-04 12:50:50');
 INSERT INTO `messages` VALUES ('37', '31.34.37', '0', '31', '1', '2009-04-04 12:51:21', '2', '2009-04-04 12:51:21');
-INSERT INTO `forum_permisions` VALUES ('1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0');
-INSERT INTO `forum_permisions` VALUES ('6', '0', '1', '1', '1', '1', '1', '0', '0', '1', '0', '0');
-INSERT INTO `forum_permisions` VALUES ('7', '0', '1', '1', '0', '1', '1', '0', '0', '0', '0', '0');
-INSERT INTO `forum_permisions` VALUES ('8', '0', '1', '0', '0', '1', '0', '0', '0', '0', '0', '0');
-INSERT INTO `users` VALUES ('1', 'guest', '', '');
-INSERT INTO `users` VALUES ('2', 'arieh', 'a@b.co', '12345');
+INSERT INTO `users` VALUES ('1', 'guest', '', '', '');
+INSERT INTO `users` VALUES ('2', 'arieh', 'a@b.co', '12345', '');
+INSERT INTO `users` VALUES ('4', 'new-user', 'arieh.glazer@gmail.com', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220', '321a54a0763a6b0011349d0b1f8540c9e875a18c');
 INSERT INTO `users_permisions` VALUES ('1', '8');
 INSERT INTO `users_permisions` VALUES ('2', '1');
+INSERT INTO `users_permisions` VALUES ('4', '6');
