@@ -20,7 +20,7 @@ class ForumM extends TFModel{
 	/**
 	 * @see <Model.class.php>
 	 */
-	protected $_actions = array('open'=>'openForum','create'=>'addForum','add-users'=>'addUsers','add-editors'=>'addEditors','add-admins'=>'addAdmins');
+	protected $_actions = array('open'=>'openForum','create'=>'addForum','add-users'=>'addUsers','add-editors'=>'addEditors','add-admins'=>'addAdmins','restrict'=>'restrictForum','free'=>'freeForum');
 	
 	/**
 	 * @param array allowed permisions for messages.
@@ -123,6 +123,11 @@ class ForumM extends TFModel{
   	 * @access protected
   	 */
   	protected function openForum(){
+  		$dbug = $this->isDebug();
+  		
+  		if ($dbug) fb('Opening Forum','line '.__LINE__);
+  		
+  		if ($dbug) fb('Validating Id','line '.__LINE__);
   		$this->validateForumId();
   		
   		if ($this->isError()) return;
@@ -131,11 +136,13 @@ class ForumM extends TFModel{
 		$start = $this->getOption('start');
 			if (!$start || !is_numeric($start)) $start = 0;
 		
+		if ($dbug) fb('Fetching Forum Info','line '.__LINE__);
 		$this->retrieveForumInfo($id,$this->isDebug());
 
 		$limit = $this->getOption('limit');
 			if (!$limit || !is_numeric($limit)) $limit = $this->_default_limit;
 		    	
+		if ($dbug) fb('Fetching Forum Messages','line '.__LINE__);
 		$this->retrieveMessages($id,$start,$limit,$this->isDebug());
   	}
   	
@@ -251,6 +258,9 @@ class ForumM extends TFModel{
     protected function addForum(){
     	$dbug=$this->isDebug();
     	
+    	if ($dbug) fb('Creating a Forum','line '.__LINE__);
+    	
+    	if ($dbug) fb('Checking Input','line '.__LINE__);
     	$this->_name = $name = $this->getOption('name');
     	$this->_desc = $desc = $this->getOption('description');
     	$admins =  $this->getOption('admins');
@@ -261,7 +271,8 @@ class ForumM extends TFModel{
     	$users =   $this->getOption('users');
     	if (!$users) $users = array();
     	
-    	$restrict = $this->isOptionSet('restrict') ? $this->getOption('restrict') : false;
+    	$restrict = $this->getOption('restricted');
+    	$closed   = $this->getOption('closed');
 		
 		if ( !$name || strlen($name)<3 ) $this->setError('shortName');
 		if ( !$desc || strlen($desc)<3 ) $this->setError('shortDesc');
@@ -278,19 +289,33 @@ class ForumM extends TFModel{
 		
 		if ($this->isError()) return false;
 		
+		if ($dbug) fb('Creating Forum in DB','line '.__LINE__);
 		$this->createForum($name,$desc,$dbug);    	
 		
+		if ($dbug) fb('Creating Forum Permissions','line '.__LINE__);
 		$this->createForumPermissions($this->getId(),$dbug);
     	
+    	if ($dbug) fb('Setting Forum Admins','line '.__LINE__);
     	$this->setAdmins($admins,$dbug);
-    	$this->setEditors($editors,$dbug);
-    	$this->setUsers($users,$dbug);
     	
-    	if ($restrict) $this->restrictForum($dbug);
+    	if ($editors){
+    		if ($dbug) fb('Setting Forum Editors','line '.__LINE__);
+    		$this->setEditors($editors,$dbug);
+    	}
+    	
+    	if ($users){
+    		if ($dbug) fb('Setting Forum Users','line '.__LINE__);
+    		$this->setUsers($users,$dbug);
+    	}
+    	
+    	if ($dbug) fb('Setting Forum Restrictions','line '.__LINE__);
+    	if ($restrict) $this->setRestricted($this->getId(),false,$dbug);
+    	if ($closed)   $this->setRestricted($this->getId(),true,$dbug);
     	
     	$perms = $this->getOption('forum-permisions');
     	
     	if (is_array($perms) && count($perms)>0){
+    		if ($dbug) fb('Setting Additional Permissions','line '.__LINE__);
     		$this->addPermisions($perms,$this->isDebug());
     	}
     }
@@ -352,47 +377,20 @@ class ForumM extends TFModel{
     	$admin  = $this->_admin_permission  = NewDao::getInstance()->insert('permisions',array('name'=>$this->getName() . '-admin'),$log);
     	$editor = $this->_editor_permission = NewDao::getInstance()->insert('permisions',array('name'=>$this->getName() . '-editor'),$log);
     	$user   = $this->_user_permission   = NewDao::getInstance()->insert('permisions',array('name'=>$this->getName() . '-user'),$log);
-    	NewDao::getInstance()->insert(
-			'forum_permisions',
-			array(
-				'forum_id'=>$this->getId(),
-				'permision_id'=>$admin,
-				'open'=>1,
-				'remove'=>1,
-				'view'=>1,
-				'create'=>1,
-				'move'=>1,
-				'add-users'=>1,
-				'add-editors'=>1
-			),
-			$log
-		);
-		
-		NewDao::getInstance()->insert(
-			'forum_permisions',
-			array(
-				'forum_id'=>$this->getId(),
-				'permision_id'=>$editor,
-				'open'=>1,
-				'view'=>1,
-				'create'=>1,
-				'move'=>1,
-				'add-users'=>1
-			),
-			$log
-		);
-		
-		NewDao::getInstance()->insert(
-			'forum_permisions',
-			array(
-				'forum_id'=>$this->getId(),
-				'permision_id'=>$user,
-				'open'=>1,
-				'view'=>1,
-				'create'=>1,
-			),
-			$log
-		);
+    	
+    	$options = array('open'=>1,	'view'=>1, 'create'=>1);
+    	
+    	$this->insertForumPermission($id,$user,$options,$log);
+    	
+    	$options['move']=1;
+    	$options['add-users']=1;
+    	$this->insertForumPermission($id,$editor,$options,$log);
+    	
+    	$options['remove']=1;
+    	$options['add-editors']=1;
+    	$options['restrict']=1;
+    	$options['free']=1;
+    	$this->insertForumPermission($id,$admin,$options,$log);
     }
     
     /**
@@ -429,27 +427,32 @@ class ForumM extends TFModel{
     
     /**
      * sets the forum to restrict mode
+     * 	@param int  $id  forum id
+     * 	@param bool $all whether to close for all users, or just for guests
      * 	@param bool $log
      * @access private 
      */
-    private function restrictForum($log=false){
-    	NewDao::getInstance()->insert(
-			'forum_permisions',
-			array(
-				'forum_id'=>$this->getId(),
-				'permision_id'=>8
-			),
-			$log
-		);
-		
-		NewDao::getInstance()->insert(
-			'forum_permisions',
-			array(
-				'forum_id'=>$this->getId(),
-				'permision_id'=>7
-			),
-			$log
-		);
+    private function setRestricted($id,$all=false,$log=false){
+    	if ($this->doesForumPermissionExists($id,8,$log)){
+    		$this->deleteForumPermission($id,8,$log);
+    	}
+    	
+    	$this->insertForumPermission($this->getId(),8,array(),$log);
+    	
+    	if (!$all) return;
+    	
+    	if ($this->doesForumPermissionExists($id,7,$log)){
+    		$this->deleteForumPermission($id,7,$log);
+    	}
+    	
+    	$this->insertForumPermission($this->getId(),7,array(),$log);
+    }
+    
+    private function doesForumPermissionExists($forum,$permission,$log){
+    	return(
+    		NewDao::getInstance()
+    		->countFields('forum_permisions',array('forum_id'=>$forum,'permision_id'=>$permission),$log)>0
+    	);
     }
     
     /**
@@ -580,6 +583,69 @@ class ForumM extends TFModel{
 		);
 	}
 	
+	/**
+	 * sets the forum as restricted
+	 * @access protected
+	 */
+	protected function restrictForum(){
+		$this->validateForumId();
+  		
+  		$close = $this->getOption('close');
+  		
+  		if ($this->isError()) return;
+  		
+  		$id = $this->getId();
+  		
+  		$this->setResticted($id,$close,$this->isDebug());
+	}
+	
+	/**
+	 * unrestricts a forum
+	 * @access protected
+	 */
+	protected function freeForum(){
+		$this->validateForumId();
+  		
+  		if ($this->isError()) return;
+  		
+  		$id = $this->getId();
+  		
+  		$this->setFree($id);
+	}
+	
+	/**
+	 * removes any global binding restriction permission
+	 * 	@param int $id forum id
+	 * 	@param bool $log
+	 * @access private
+	 */
+	private function setFree($id,$log=false){
+		if ($this->doesForumPermissionExists($id,8,$log)){
+    		$this->deleteForumPermission($id,8,$log);
+    	}
+    	
+    	if ($this->doesForumPermissionExists($id,7,$log)){
+    		$this->deleteForumPermission($id,7,$log);
+    	}
+	}
+	
+	private function deleteForumPermission($forum,$perm,$log=false){
+   		NewDao::getInstance()->delete(
+   			'forum_permisions',
+   			array(
+				'forum_id'=>$forum,
+				'permision_id'=>$perm
+			),
+			$log
+   		);
+	}
+	
+	private function insertForumPermission($forum,$perm,$options=array(),$log=false){
+		if (!is_array($options)) $options=array();
+		$options['forum_id']=$forum;
+		$options['permision_id']=$perm;
+		NewDao::getInstance()->insert('forum_permisions',$options,$log);
+	}
 }
 
 class ForumMException extends TFModelException{}
