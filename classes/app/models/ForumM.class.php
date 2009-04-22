@@ -40,7 +40,7 @@ class ForumM extends TFModel{
 	 * @param int forum id
 	 * @access protected
 	 */
-	protected $_id = 0;
+	protected $_id = null;
 	
 	/**
 	 * @param string forum name
@@ -77,6 +77,13 @@ class ForumM extends TFModel{
 	 * @access protected
 	 */
 	protected $_user_permission = 0;
+	
+	
+	public function __construct($options=array()){
+		parent::__construct($options);
+		if ($this->getAction()=='create') return;
+		$this->validateForumId();
+	}
 	
 	/**
      * @see <Model.class.php>
@@ -159,13 +166,13 @@ class ForumM extends TFModel{
   	 * @access private
   	 */
   	private function validateForumId(){
-  		if (is_numeric($this->_id)) return;
+  		if (!is_null($this->_id) && is_numeric($this->_id)) return;
   		
-  		$this->_id =0;
+  		$id = $this->_id =0;
   		if (!$this->isOptionSet('id')){
   			$this->setError('noId');
-  		}else $id = $this->getOption('id');
-  		
+  			return;
+  		}else $this->_id = $id = $this->getOption('id');
   		if (!$this->doesForumExists($id,false)){
   			throw new ForumMException('supplied forum id ('.$id.') is invalid');
   		}
@@ -427,7 +434,7 @@ class ForumM extends TFModel{
     			case $name . '-editor':
     				$this->_editor_permission = $perm['id'];
     			break;
-    			case $name . '-admin':
+    			case $name . '-user':
     				$this->_user_permission = $perm['id'];
     			break;
     		}
@@ -506,7 +513,6 @@ class ForumM extends TFModel{
 	 * @access protected
 	 */
 	protected function addUsers(){
-		$this->validateForumId();
 		
 		$users = $this->getOption('users');
 		if (!$users) $this->setError('noUsers');
@@ -516,7 +522,10 @@ class ForumM extends TFModel{
 		if ($this->isError()) return;
 		
 		$name = $this->getName();
-		if (!$name) $name = $this->_name = $this->retrieveForumInfo($this->getId,$this->isDebug());
+		if (!$name){
+			$this->retrieveForumInfo($this->getId(),$this->isDebug());
+			$name = $this->getName();
+		} 
 		
 		$this->retrieveForumPermissions($name,$this->isDebug());
 		
@@ -528,7 +537,6 @@ class ForumM extends TFModel{
 	 * @access protected
 	 */
 	protected function addEditors(){
-		$this->validateForumId();
 		
 		$users = $this->getOption('users');
 		if (!$users || !is_array($users)) $this->setError('noUsers');
@@ -539,7 +547,10 @@ class ForumM extends TFModel{
 		if ($this->isError()) return;
 		
 		$name = $this->getName();
-		if (!$name) $name = $this->_name = $this->retrieveForumInfo($this->getId,$this->isDebug());
+		if (!$name){
+			$this->retrieveForumInfo($this->getId(),$this->isDebug());
+			$name = $this->getName();
+		} 
 		
 		$this->retrieveForumPermissions($name,$this->isDebug());
 		
@@ -551,7 +562,6 @@ class ForumM extends TFModel{
 	 * @access protected
 	 */
 	protected function addAdmins(){
-		$this->validateForumId();
 		
 		$users = $this->getOption('users');
 		if (!$users) $this->setError('noUsers');
@@ -561,7 +571,10 @@ class ForumM extends TFModel{
 		if ($this->isError()) return;
 		
 		$name = $this->getName();
-		if (!$name) $name = $this->_name = $this->retrieveForumInfo($this->getId,$this->isDebug());
+		if (!$name){
+			$this->retrieveForumInfo($this->getId(),$this->isDebug());
+			$name = $this->getName();
+		} 
 		
 		$this->retrieveForumPermissions($name,$this->isDebug());
 		
@@ -576,6 +589,7 @@ class ForumM extends TFModel{
 	 */
 	private function retrieveForumInfo($id,$log=false){
 		$res = NewDao::getInstance()->select('forums',array('name','description'),array('id'=>$id),true,$log);
+		
 		$this->_name = $res['name'];
 		$this->_desc = $res['description'];
 	}
