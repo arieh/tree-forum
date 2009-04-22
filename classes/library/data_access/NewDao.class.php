@@ -399,12 +399,13 @@ class NewDao{
 	 * 		@param array  $fields  the fields to insert and their new values
 	 * 		@param bool   $log     whether to logg SQL statement or not
 	 * @access public
-	 * @return bool whether success or not 
+	 * @return bool|int whether success or not|newest id created by an auto-incramented id 
 	 */	
 	public function insert($table,$fields,$log=false){
 		$sql = $this->generateInsertSQL($table,$fields);
-		$this->query($sql,$log);
-		return;
+		$query = $this->query($sql,$log);
+		if ($id = $this->getLastId() && is_numeric($id)) return $id;
+		return $query;
 	}
 	
 	/**
