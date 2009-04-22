@@ -92,7 +92,7 @@ class NewDao{
     			$link = mysql_connect($host,$user,$pass);
     			mysql_select_db($db,$link);
     			if (mysql_error($link)){
-    				throw new NewDaoException("Mysql Error:".mysql_error($link),"MysqlConnectionError",__LINE__,__FILE__);
+    				throw new NewDaoException("Mysql Error:".mysql_error($link));
     			}
     			self::$_connected = true;
     			self::$_link = $link;
@@ -101,7 +101,7 @@ class NewDao{
     		default:
     			$link = new mysqli($host,$user,$pass,$db);
 				if (mysqli_errno($link)){
-					throw new NewDaoException(mysqli_error($link),"MysqliConnectionError",__LINE__,__FILE__);
+					throw new NewDaoException("Mysqli Error:".mysqli_error($link));
 				}
 				self::$_connected = true;
 				self::$_link = $link;
@@ -404,7 +404,10 @@ class NewDao{
 	public function insert($table,$fields,$log=false){
 		$sql = $this->generateInsertSQL($table,$fields);
 		$query = $this->query($sql,$log);
-		if ($id = $this->getLastId() && is_numeric($id)) return $id;
+		$id = $this->getLastId();
+		if (is_numeric($id)){
+			return $id;
+		}
 		return $query;
 	}
 	
