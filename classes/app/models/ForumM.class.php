@@ -20,7 +20,15 @@ class ForumM extends TFModel{
 	/**
 	 * @see <Model.class.php>
 	 */
-	protected $_actions = array('open'=>'openForum','create'=>'addForum','add-users'=>'addUsers','add-editors'=>'addEditors','add-admins'=>'addAdmins','restrict'=>'restrictForum','free'=>'freeForum');
+	protected $_actions = array(
+		'open'=>'openForum',
+		'create'=>'addForum',
+		'add-users'=>'addUsers',
+		'add-editors'=>'addEditors',
+		'add-admins'=>'addAdmins',
+		'restrict'=>'restrictForum',
+		'free'=>'freeForum'
+	);
 	
 	/**
 	 * @param array allowed permisions for messages.
@@ -523,7 +531,8 @@ class ForumM extends TFModel{
 		$this->validateForumId();
 		
 		$users = $this->getOption('users');
-		if (!$users) $this->setError('noUsers');
+		if (!$users || !is_array($users)) $this->setError('noUsers');
+		
 		foreach ($users as $userid)
 			if (!is_numeric($userid) || !$this->doesUserExists($userid,$this->isDebug())) throw new ForumMException('user id ('.$userid.') is invalid');		
 		
