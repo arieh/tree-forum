@@ -4,26 +4,21 @@ require_once('autoloader.php');
 require_once('..'._SEP_.'classes'._SEP_.'library'._SEP_.'firePHP'._SEP_.'fb.php');
 require_once('errorHandler.php');
 	
-	NewDao::connect('mysql','localhost','root','pass','tree-forum');
+	NewDao::connect('mysql','localhost','root','rjntqvzz','treeforum');
 	NewDao::setLogger('fb');	
-		
+	
+	TFUser::setId(2);
+	TFUser::setDebug(true);
+	
 	$options= array(
 		'action'=>'create',
 		'name'=>'random forum',
 		'description'=>'a forum with a permision',
-		'permisions'=>array(1),
-		'forum-permisions'=>array(
-			array(			
-				'permision_id'=>4,
-				'open'=>1,
-				'add'=>1,
-				'view'=>1
-			),
-			array(
-				'permision_id'=>5,
-				'open'=>1
-			)
-		),
+		'permisions'=>TFUser::getInstance()->getPermissionIds(false),
+		'admins'=>array(4),
+		'editors'=>array(5),
+		'users'=>array(6),
+		'restrict'=>true,
 		'debug'=>true
 	);
 	
