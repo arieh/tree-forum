@@ -4,8 +4,8 @@
 	
 	$options= array(
 		'action'=>'create',
-		'name'=>'random forum',
-		'description'=>'a forum with a permision',
+		'name'=>'another random forum',
+		'description'=>'a forum with a permission set',
 		'permisions'=>TFUser::getInstance()->getPermissionIds(false),
 		'admins'=>array(4),
 		'editors'=>array(5),

@@ -1,5 +1,5 @@
 <?php
-	TFUser::setId(6);
+	TFUser::setId(1);
 	TFUser::setDebug(true);
 	
 	$options= array(
