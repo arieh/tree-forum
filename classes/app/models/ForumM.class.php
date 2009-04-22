@@ -1,41 +1,4 @@
 <?php
-/*
- * action list:
- * 
- * + 'open': open a forum page
- * 		required: 
- * 			- id(int) forum id
- * 		optional: 
- * 			- start(int) how many root messages to skip
- * 			- limit(int) how many root messages to pull
- * 		accessors:
- * 			- getId() - returns forum id
- * 			- getMessage() - return a message accessor from the message-tree:
- * 					+ getId()
- * 					+ getTitle()
- * 					+ getMessage() - returns message content
- * 					+ getTime()
- * 					+ getUserId()
- * + 'create': create a forum
- * 		required:
- * 			- name (string) forum name. must be longer than 3 chars
- * 			- description (string) forum description. must be longer than 3 chars
- * 			- admin (int) admin user id
- *		optional:
- *			- forum-permisions (array) an array of associative arrays of the following structure:
- *				* permision_id (int) a permision's id
- *				* a list of action as 'action-name' => 1/0
- * 		errors: 
- * 			- 'shortName' : forum name is invalid (empty, too short, or not a string)
- * 			- 'shortDesc' : forum description is invalid (empty, too short, or not a string)
- * 			- 'noAdmin'   : no admin id was set
- * 		accessors: getId()
- * 
- * 
- * returned object for getMessage() will have the following methods:
- * getId(), getTitle(), getTime(), getContent(), getUserId(), getUserName()
- */
-
 class ForumM extends TFModel{
 	/**
 	 * @var int default message limit per forum page (root meassages)
@@ -57,7 +20,7 @@ class ForumM extends TFModel{
 	/**
 	 * @see <Model.class.php>
 	 */
-	protected $_actions = array('open'=>'openForum','create'=>'addForum','allow'=>'addAllowed');
+	protected $_actions = array('open'=>'openForum','create'=>'addForum','add-users'=>'addUsers','add-editors'=>'addEditors','add-admins'=>'addAdmins');
 	
 	/**
 	 * @param array allowed permisions for messages.
@@ -71,11 +34,41 @@ class ForumM extends TFModel{
 	 */
 	protected $_id = 0;
 	
+	/**
+	 * @param string forum name
+	 * @access protected
+	 */
 	protected $_name = '';
 	
+	/**
+	 * @param string forum description
+	 * @access protected
+	 */
 	protected $_desc = '';
 	
+	/**
+	 * @param int forum id
+	 * @access protected
+	 */
 	protected $_admin = 0;
+	
+	/**
+	 * @param int admins permission id
+	 * @access protected
+	 */
+	protected $_admin_permission = 0;
+	
+	/**
+	 * @param int editors permission id
+	 * @access protected
+	 */
+	protected $_editor_permission = 0;
+	
+	/**
+	 * @param int users permission id
+	 * @access protected
+	 */
+	protected $_user_permission = 0;
 	
 	/**
      * @see <Model.class.php>
@@ -98,7 +91,7 @@ class ForumM extends TFModel{
     		$this->setError('noPermision');
     		return false;
     	}
-    	
+		    	
     	while ($permision = $this->getPermision()){
     		if ($this->doesHavePermision($action,$permision,true)) return true;
     	}
@@ -116,7 +109,7 @@ class ForumM extends TFModel{
      */
     private function doesHavePermision($action,$permision,$log=false){
     	//if this action is forbiden for this permision
-    	if (NewDao::getInstance()->countFields('forum_permisions',array($action=>0,'forum_id'=>$this->getId()),$log)>0) return false;
+    	#if (NewDao::getInstance()->countFields('forum_permisions',array($action=>0,'forum_id'=>$this->getId()),$log)>0) return false;
     	
     	//if this permision is globaly allowed
     	if (NewDao::getInstance()->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>0),$log)>0) return true;
@@ -131,10 +124,15 @@ class ForumM extends TFModel{
   	 */
   	protected function openForum(){
   		$this->validateForumId();
+  		
+  		if ($this->isError()) return;
+  		
   		$id = $this->getId();
 		$start = $this->getOption('start');
 			if (!$start || !is_numeric($start)) $start = 0;
 		
+		$this->retrieveForumInfo($id,$this->isDebug());
+
 		$limit = $this->getOption('limit');
 			if (!$limit || !is_numeric($limit)) $limit = $this->_default_limit;
 		    	
@@ -149,13 +147,12 @@ class ForumM extends TFModel{
   		if (is_numeric($this->_id)) return;
   		
   		$this->_id =0;
-  		if (!$this->getOption('id')){
-  			throw new ForumMException('no forum id supplied');
-  		
+  		if (!$this->isOptionSet('id')){
+  			$this->setError('noId');
   		}else $id = $this->getOption('id');
   		
   		if (!$this->doesForumExists($id,false)){
-  			throw new ForumMException('no forum id supplied');
+  			throw new ForumMException('supplied forum id ('.$id.') is invalid');
   		}
   		$this->_id = $id;
   	}
@@ -252,35 +249,44 @@ class ForumM extends TFModel{
      * @access protected
      */
     protected function addForum(){
+    	$dbug=$this->isDebug();
+    	
     	$this->_name = $name = $this->getOption('name');
     	$this->_desc = $desc = $this->getOption('description');
-    	$this->_admin = $admin = $this->getOption('admin');
+    	$admins =  $this->getOption('admins');
+    	
+    	$editors = $this->getOption('editors');
+    	if (!$editors) $editors = array();
+    	
+    	$users =   $this->getOption('users');
+    	if (!$users) $users = array();
+    	
     	$restrict = $this->isOptionSet('restrict') ? $this->getOption('restrict') : false;
 		
 		if ( !$name || strlen($name)<3 ) $this->setError('shortName');
 		if ( !$desc || strlen($desc)<3 ) $this->setError('shortDesc');
-		if ( !$admin ) $this->setError('noAdmin');
-		elseif ( !is_numeric($admin) || !$this->doesUserExists($admin) ) throw new ForumMException('bad admin id');
+		if ( !$admins ) $this->setError('noAdmins');
+		
+		foreach ($admins as $admin)
+			if ( !is_numeric($admin)  || !$this->doesUserExists($admin,$dbug) ) throw new ForumMException('bad admin id:'.$admin);
+		
+		foreach ($editors as $editor)
+			if ( !is_numeric($editor) || !$this->doesUserExists($editor,$dbug) ) throw new ForumMException('bad editor id:'.$editor);
+			
+		foreach ($users as $user)
+			if ( !is_numeric($user)   || !$this->doesUserExists($user,$dbug) ) throw new ForumMException('bad user id:'.$editor);
 		
 		if ($this->isError()) return false;
 		
-		$this->createForum($name,$desc,$admin,$restrict,false);    	
-    }
-    
-    /**
-     * creates a forum
-     * 	@param string $name forum name
-     * 	@param string $desc forum description
-     * 	@param int    $admin admin id
-     * 	@param bool   $restrict make forum restricted
-     * 	@param bool   $log 
-     * @access private
-     */
-    private function createForum($name,$desc,$admin,$restrict=false,$log=false){
-    	$this->_id = NewDao::getInstance()->insert('forums',array('name'=>$name,'description'=>$desc),$log);
+		$this->createForum($name,$desc,$dbug);    	
+		
+		$this->createForumPermissions($this->getId(),$dbug);
     	
-    	$this->setAdmin($admin,$log);
-    	if ($restrict) $this->restrictForum($log);
+    	$this->setAdmins($admins,$dbug);
+    	$this->setEditors($editors,$dbug);
+    	$this->setUsers($users,$dbug);
+    	
+    	if ($restrict) $this->restrictForum($dbug);
     	
     	$perms = $this->getOption('forum-permisions');
     	
@@ -290,39 +296,135 @@ class ForumM extends TFModel{
     }
     
     /**
-     * sets a user forum admin
-     * 	@param int $id user id
-     * 	@param bool $log
+     * creates a forum
+     * 	@param string $name forum name
+     * 	@param string $desc forum description
+     * 	@param bool   $log 
      * @access private
-     * @return bool sccess status
      */
-    private function setAdmin($id,$log=false){
-    	$adminPermission = $this->createAdminPermission($log);
-    	return NewDao::getInstance()->insert('users_permisions',array('user_id'=>$id,'permision_id'=>$adminPermission),$log);
+    private function createForum($name,$desc,$log=false){
+    	$this->_id = NewDao::getInstance()->insert('forums',array('name'=>$name,'description'=>$desc),$log);
     }
     
     /**
-     * creates an admin permission
-     *	@param bool $log 
+     * sets users as forum admin
+     * 	@param int $id user id
+     * 	@param bool $log
      * @access private
-     * @return int new permission's id 
      */
-    private function createAdminPermission($log=false){
-    	$perm = NewDao::getInstance()->insert('permisions',array('name'=>$this->getName()));
+    private function setAdmins($ids,$log=false){
+    	$adminPermission = $this->getAdminPermission();
+    	foreach ($ids as $id)
+    		NewDao::getInstance()->insert('users_permisions',array('user_id'=>$id,'permision_id'=>$adminPermission),$log);
+    }
+    
+    /**
+     * sets users as forum editors
+     * 	@param int $id user id
+     * 	@param bool $log
+     * @access private
+     */
+    private function setEditors($ids,$log=false){
+    	$editorPermission = $this->getEditorPermission();
+    	foreach ($ids as $id)
+    		NewDao::getInstance()->insert('users_permisions',array('user_id'=>$id,'permision_id'=>$editorPermission),$log);
+    }
+    
+    /**
+     * sets users as forum users (good for restricted forums)
+     * 	@param int $id user id
+     * 	@param bool $log
+     * @access private
+     */
+    private function setUsers($ids,$log=false){
+    	$userPermission = $this->getUserPermission();
+    	foreach ($ids as $id)
+    		NewDao::getInstance()->insert('users_permisions',array('user_id'=>$id,'permision_id'=>$userPermission),$log);
+    }
+    
+    /**
+     * creates permissions (admin,editor and user) for a forum
+     * 	@param int $id forum id
+     * 	@param bool $log
+     * @access private
+     */
+    private function createForumPermissions($id,$log=false){
+    	$admin  = $this->_admin_permission  = NewDao::getInstance()->insert('permisions',array('name'=>$this->getName() . '-admin'),$log);
+    	$editor = $this->_editor_permission = NewDao::getInstance()->insert('permisions',array('name'=>$this->getName() . '-editor'),$log);
+    	$user   = $this->_user_permission   = NewDao::getInstance()->insert('permisions',array('name'=>$this->getName() . '-user'),$log);
     	NewDao::getInstance()->insert(
 			'forum_permisions',
 			array(
 				'forum_id'=>$this->getId(),
-				'permision_id'=>$perm,
+				'permision_id'=>$admin,
 				'open'=>1,
 				'remove'=>1,
 				'view'=>1,
 				'create'=>1,
-				'move'=>1
+				'move'=>1,
+				'add-users'=>1,
+				'add-editors'=>1
 			),
 			$log
 		);
-		return $perm;
+		
+		NewDao::getInstance()->insert(
+			'forum_permisions',
+			array(
+				'forum_id'=>$this->getId(),
+				'permision_id'=>$editor,
+				'open'=>1,
+				'view'=>1,
+				'create'=>1,
+				'move'=>1,
+				'add-users'=>1
+			),
+			$log
+		);
+		
+		NewDao::getInstance()->insert(
+			'forum_permisions',
+			array(
+				'forum_id'=>$this->getId(),
+				'permision_id'=>$user,
+				'open'=>1,
+				'view'=>1,
+				'create'=>1,
+			),
+			$log
+		);
+    }
+    
+    /**
+     * retrieves a forum's main permissions (admin editor and users)
+     * 	@param string $name forum name
+     * 	@param bool $log
+     * @access private
+     */
+    private function retrieveForumPermissions($name,$log=false){
+    	$query = NewDao::getGenerator();
+    	
+    	$query->addSelect('permisions',array('id','name'));
+    	
+    	$query->addConditionSet($query->createCondition('permisions','name','=',$name . '-admin'));
+    	$query->addConditionSet($query->createCondition('permisions','name','=',$name . '-editor'));
+    	$query->addConditionSet($query->createCondition('permisions','name','=',$name . '-user'));
+    	
+    	$perms = NewDao::getInstance()->queryArray($query->generate(),$log);
+    	
+    	foreach ($perms as $perm) {
+    		switch ($perm['name']){
+    			case $name . '-admin':
+    				$this->_admin_permission = $perm['id'];
+    			break;
+    			case $name . '-editor':
+    				$this->_editor_permission = $perm['id'];
+    			break;
+    			case $name . '-admin':
+    				$this->_user_permission = $perm['id'];
+    			break;
+    		}
+    	}
     }
     
     /**
@@ -387,9 +489,97 @@ class ForumM extends TFModel{
     	return (NewDao::getInstance()->countFields('permisions',array('id'=>$per),$log)>0);
     }
 	
-	protected function addAllowed(){
+	/**
+	 * adds users to the forum's user list
+	 * @access protected
+	 */
+	protected function addUsers(){
+		$this->validateForumId();
 		
+		$users = $this->getOption('users');
+		if (!$users) $this->setError('noUsers');
+		foreach ($users as $userid)
+			if (!is_numeric($userid) || !$this->doesUserExists($userid,$this->isDebug())) throw new ForumMException('user id ('.$userid.') is invalid');		
+		
+		if ($this->isError()) return;
+		
+		$name = $this->getName();
+		if (!$name) $name = $this->_name = $this->retrieveForumInfo($this->getId,$this->isDebug());
+		
+		$this->retrieveForumPermissions($name,$this->isDebug());
+		
+		$this->setUsers($users,$this->isDebug());		
 	}
+	
+	/**
+	 * adds users to the forum's editors list
+	 * @access protected
+	 */
+	protected function addEditors(){
+		$this->validateForumId();
+		
+		$users = $this->getOption('users');
+		if (!$users) $this->setError('noUsers');
+		foreach ($users as $userid)
+			if (!is_numeric($userid) || !$this->doesUserExists($userid,$this->isDebug())) throw new ForumMException('user id ('.$userid.') is invalid');		
+		
+		if ($this->isError()) return;
+		
+		$name = $this->getName();
+		if (!$name) $name = $this->_name = $this->retrieveForumInfo($this->getId,$this->isDebug());
+		
+		$this->retrieveForumPermissions($name,$this->isDebug());
+		
+		$this->setEditors($users,$this->isDebug());		
+	}
+	
+	/**
+	 * adds users to the forum's admins list
+	 * @access protected
+	 */
+	protected function addAdmins(){
+		$this->validateForumId();
+		
+		$users = $this->getOption('users');
+		if (!$users) $this->setError('noUsers');
+		foreach ($users as $userid)
+			if (!is_numeric($userid) || !$this->doesUserExists($userid,$this->isDebug())) throw new ForumMException('user id ('.$userid.') is invalid');		
+		
+		if ($this->isError()) return;
+		
+		$name = $this->getName();
+		if (!$name) $name = $this->_name = $this->retrieveForumInfo($this->getId,$this->isDebug());
+		
+		$this->retrieveForumPermissions($name,$this->isDebug());
+		
+		$this->setAdmins($users,$this->isDebug());		
+	}
+	
+	/**
+	 * retrieves the forums info
+	 * 	@param int $id forum id
+	 * 	@param bool $log
+	 * @access private
+	 */
+	private function retrieveForumInfo($id,$log=false){
+		$res = NewDao::getInstance()->select('forums',array('name','description'),array('id'=>$id),true,$log);
+		$this->_name = $res['name'];
+		$this->_desc = $res['description'];
+	}
+
+	/**
+	 * checks if a specific user id exists
+	 * 	@param int $id user id
+	 * 	@param bool $log
+	 * @access private
+	 */	
+	private function doesUserExists($id,$log=false){
+		return (
+			NewDao::getInstance()
+			->countFields('users',array('id'=>$id),$log)>0
+		);
+	}
+	
 }
 
 class ForumMException extends TFModelException{}
