@@ -2,7 +2,6 @@
 /*
  * this is an example of how to use the Query object 
  */
-require_once('autoloader.php');
 //NewDao::connect('mysql','localhost','root','pass','tree-forum');
 
 $query = NewDao::getGenerator();

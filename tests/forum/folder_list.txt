@@ -1,6 +1,0 @@
-../../classes/library/
-../../classes/library/userAtuh/
-../../classes/library/models/
-../../classes/library/data_access/
-../../classes/app/
-../../classes/app/models/
