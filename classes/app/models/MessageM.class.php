@@ -117,14 +117,46 @@ class MessageM extends TFModel{
      * @return bool
      */
     private function doesHavePermision($action,$permision,$log=false){
-    	//if this action is forbiden for this permision
-    	if ($this->_link->countFields('forum_permisions',array($action=>0,'forum_id'=>$this->getForumId(),'permision_id'=>$permision),$log)>0) return false;
+    	$no_ids = array('create');
+    	$globalPermission = (
+    		NewDao::getInstance()
+    			->countFields(
+					'forum_permisions',
+					array(
+						$action=>1,
+						'permision_id'=>$permision,
+						'forum_id'=>0
+					),
+					$log)>0
+		);
+    	if (in_array($this->getAction,$no_ids)){
+    		$globalBlock =( 
+    			NewDao::getInstance()
+    				->countFields(
+						'forum_permisions',
+						array(
+							$action=>0,
+							'forum_id'=>$this->getForumId()
+						),
+						$log)>0
+    		); 
+    		$specificPermission = (
+    			NewDao::getInstance()
+    				->countFields(
+						'forum_permisions',
+						array(
+							$action=>1,
+							'permision_id'=>$permision,
+							'forum_id'=>$this->getForumId()
+						),
+						$log)>0
+			);	
+    	}else{
+    		$globalBlock = true;
+    		$specificPermission = true;
+    	}
     	
-    	//if this permision is globaly allowed
-    	if ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>0),$log)>0) return true;
-    	
-    	// if this permision is specificly allowed
-    	return ($this->_link->countFields('forum_permisions',array($action=>1,'permision_id'=>$permision,'forum_id'=>$this->getForumId()),$log)>0);
+    	return ($globalPermission && ($globalBlock && $specificPermission || !$globalBlock) );
     }
 	
 	/**
