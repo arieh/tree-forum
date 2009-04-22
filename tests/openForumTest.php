@@ -4,16 +4,20 @@ require_once('autoloader.php');
 require_once('..'._SEP_.'classes'._SEP_.'library'._SEP_.'firePHP'._SEP_.'fb.php');
 require_once('errorHandler.php');
 	
-	NewDao::connect('mysql','localhost','root','pass','tree-forum');
+	NewDao::connect('mysql','localhost','root','rjntqvzz','tree-forum');
 	NewDao::setLogger('fb');	
-	TFUser::setId(2);
+	
+	TFUser::setId(6);
+	TFUser::setDebug(true);
+	
 	$options= array(
-		'id'=>1,
+		'id'=>22,
 		'start'=>0,
 		'limit'=>10,
-		'permisions'=>TFUser::getInstance()->getPermissions(false),
+		'permisions'=>TFUser::getInstance()->getPermissionIds(false),
 		'debug'=>true
 	);
+	
 	$forum= new ForumM($options);
 	$forum->execute();
 	$prevDepth =0;
@@ -27,7 +31,7 @@ require_once('errorHandler.php');
 <?php
 while ($msg = $forum->getMessage()):?>
 <div style = 'margin-left:<?php echo ($msg->getDepth()*15);?>px'>
-	<?php echo "ID:".$msg->getId()." :: ".$msg->getMessage()." : ".$msg->getTime();?>
+	<?php echo "ID:".$msg->getId()." :: ".$msg->getMessage()." : ".$msg->getTime();?> By User: <em><?php echo $msg->getUserName();?></em>
 </div>
 <?php endwhile;
 ?>

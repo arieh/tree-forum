@@ -1,3 +1,12 @@
+/*
+MySQL Data Transfer
+Source Host: localhost
+Source Database: treeforum
+Target Host: localhost
+Target Database: treeforum
+Date: 22/04/2009 14:29:02
+*/
+
 SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 -- Table structure for forum_permisions
@@ -14,11 +23,12 @@ CREATE TABLE `forum_permisions` (
   `create` tinyint(1) NOT NULL DEFAULT '0',
   `remove` tinyint(1) NOT NULL DEFAULT '0',
   `move` tinyint(1) NOT NULL DEFAULT '0',
-  `add-permision` tinyint(1) DEFAULT '0',
-  `restrict` tinyint(1) DEFAULT '0',
-  PRIMARY KEY (`permision_id`),
-  KEY `permision_id` (`permision_id`),
-  CONSTRAINT `forum_permisions_ibfk_3` FOREIGN KEY (`permision_id`) REFERENCES `permisions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  `restrict` tinyint(1) NOT NULL DEFAULT '0',
+  `free` tinyint(1) NOT NULL DEFAULT '0',
+  `add-editors` tinyint(1) NOT NULL DEFAULT '0',
+  `add-users` tinyint(1) NOT NULL DEFAULT '0',
+  `add-admins` tinyint(1) NOT NULL DEFAULT '0',
+  KEY `permision_id` (`permision_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -31,7 +41,7 @@ CREATE TABLE `forums` (
   `name` varchar(45) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `message_id` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for message_contents
@@ -65,7 +75,7 @@ CREATE TABLE `messages` (
   KEY `dna` (`dna`),
   CONSTRAINT `forum_id` FOREIGN KEY (`forum_id`) REFERENCES `forums` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `root_id` FOREIGN KEY (`root_id`) REFERENCES `messages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Table structure for permisions
@@ -75,7 +85,7 @@ CREATE TABLE `permisions` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for temp-keys
@@ -112,7 +122,7 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`),
   UNIQUE KEY `uid` (`uid`,`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for users_permisions

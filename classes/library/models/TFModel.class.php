@@ -13,7 +13,7 @@ class TFModel{
 	 * @access private
 	 * @static
 	 */
-	static private $_TF_MODEL_VERSION = '0.3.2';
+	static private $_TF_MODEL_VERSION = '0.5';
 	
 	/**
 	 * @var NewDao a database handler object

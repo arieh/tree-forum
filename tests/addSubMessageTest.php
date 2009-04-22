@@ -6,17 +6,20 @@ require_once('errorHandler.php');
 	
 	NewDao::connect('mysql','localhost','root','pass','tree-forum');
 	NewDao::setLogger('fb');	
+	
+	TFUser::setId(6);
+	TFUser::setDebug(true);
 		
 	$options= array(
 		'action'=>'add',
-		'title'=>'another sub-sub message',
-		'message'=>'another sub-sub message to 3nd base message',
-		'forum'=>1,
+		'title'=>'a 2nd sub message',
+		'message'=>'a sub message to 2nd base message',
+		'forum'=>22,
 		'base'=>false,
-		'parent'=>34,
-		'permisions'=>array(1),
+		'parent'=>39,
+		'permisions'=>TFUser::getInstance()->getPermissionIds(false),
 		'debug'=>true,
-		'user'=>3
+		'user'=>TFUser::getId()
 	);
 	$message = new MessageM($options);
 	$message->execute();

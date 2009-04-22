@@ -254,6 +254,16 @@ class MysqlQuery implements Query{
 		return $this;
 	}
 	
+	public function noLimit(){
+		$this->_limit = array();
+	}
+	public function noOrder(){
+		$this->_order = array();
+	}
+	public function noGroup(){
+		$this->_group = array();
+	}
+	
 	/**
 	 * generates an SQL statment
 	 * 

@@ -210,6 +210,7 @@ class ForumM extends TFModel{
 			$ids[]=$msg['id'];
 		}
 		$query->resetConditions();
+		$query->noLimit();
 		
 		$query->addConditionSet(
 			$query->createCondition('messages','root_id','IN',$ids),

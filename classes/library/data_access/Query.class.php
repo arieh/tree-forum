@@ -102,4 +102,8 @@ interface Query{
 	 * @return Query a referance to the object
 	 */
 	public function limit($s,$c=false);
+	
+	public function noLimit();
+	public function noOrder();
+	public function noGroup();
 }
