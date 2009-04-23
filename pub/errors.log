@@ -65,3 +65,39 @@ Stack:
 				>> MessageM->checkPermision() args:() On line 96 From file C:\xampp\htdocs\forum-example\classes\library\models\TFModel.class.php
 					>> MessageM->doesHavePermision() args:([0::(string)][1::(string)][2::(boolean)TRUE]) On line 106 From file C:\xampp\htdocs\forum-example\classes\app\models\MessageM.class.php
 =======================================
+
+ERROR: Undefined property: MessageM::$getAction 
+On Line: 132 On File: C:\xampp\htdocs\forum-example\classes\app\models\MessageM.class.php 
+Stack:
+
+>> TFRouter::route() args:([0::(string)][1::(string)][2::(string)]) On line 11 From file C:\xampp\htdocs\forum-example\pub\index.php
+	>> TFController->__construct() args:([0::(array)["view","38"]][1::(object)MessageC{}]) On line 33 From file C:\xampp\htdocs\forum-example\classes\library\TFRouter.class.php
+		>> MessageM->execute() args:() On line 49 From file C:\xampp\htdocs\forum-example\classes\library\controllers\TFController.class.php
+			>> TFModel->execute() args:() On line 168 From file C:\xampp\htdocs\forum-example\classes\app\models\MessageM.class.php
+				>> MessageM->checkPermision() args:() On line 96 From file C:\xampp\htdocs\forum-example\classes\library\models\TFModel.class.php
+					>> MessageM->doesHavePermision() args:([0::(string)][1::(string)][2::(boolean)TRUE]) On line 106 From file C:\xampp\htdocs\forum-example\classes\app\models\MessageM.class.php
+=======================================
+
+ERROR: Undefined property: MessageM::$getAction 
+On Line: 132 On File: C:\xampp\htdocs\forum-example\classes\app\models\MessageM.class.php 
+Stack:
+
+>> TFRouter::route() args:([0::(string)][1::(string)][2::(string)]) On line 11 From file C:\xampp\htdocs\forum-example\pub\index.php
+	>> TFController->__construct() args:([0::(array)["view","41"]][1::(object)MessageC{"bPath":"http:\/\/localhost\/forum-example\/pub\/"}]) On line 33 From file C:\xampp\htdocs\forum-example\classes\library\TFRouter.class.php
+		>> MessageM->execute() args:() On line 49 From file C:\xampp\htdocs\forum-example\classes\library\controllers\TFController.class.php
+			>> TFModel->execute() args:() On line 168 From file C:\xampp\htdocs\forum-example\classes\app\models\MessageM.class.php
+				>> MessageM->checkPermision() args:() On line 96 From file C:\xampp\htdocs\forum-example\classes\library\models\TFModel.class.php
+					>> MessageM->doesHavePermision() args:([0::(string)][1::(string)][2::(boolean)TRUE]) On line 106 From file C:\xampp\htdocs\forum-example\classes\app\models\MessageM.class.php
+=======================================
+
+ERROR: Undefined property: MessageM::$getAction 
+On Line: 132 On File: C:\xampp\htdocs\forum-example\classes\app\models\MessageM.class.php 
+Stack:
+
+>> TFRouter::route() args:([0::(string)][1::(string)][2::(string)]) On line 11 From file C:\xampp\htdocs\forum-example\pub\index.php
+	>> TFController->__construct() args:([0::(array)["view","41"]][1::(object)MessageC{"bPath":"http:\/\/localhost\/forum-example\/pub\/"}]) On line 33 From file C:\xampp\htdocs\forum-example\classes\library\TFRouter.class.php
+		>> MessageM->execute() args:() On line 49 From file C:\xampp\htdocs\forum-example\classes\library\controllers\TFController.class.php
+			>> TFModel->execute() args:() On line 168 From file C:\xampp\htdocs\forum-example\classes\app\models\MessageM.class.php
+				>> MessageM->checkPermision() args:() On line 96 From file C:\xampp\htdocs\forum-example\classes\library\models\TFModel.class.php
+					>> MessageM->doesHavePermision() args:([0::(string)][1::(string)][2::(boolean)TRUE]) On line 106 From file C:\xampp\htdocs\forum-example\classes\app\models\MessageM.class.php
+=======================================
