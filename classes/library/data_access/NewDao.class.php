@@ -77,7 +77,7 @@ class NewDao{
 	/**
 	 * connect to a database
 	 * 	@param string $type database type
-	 * 	@param string $host host name
+	 * 	@param string $host host name or a location of ini file 
 	 * 	@param string $user user name
 	 * 	@param string $pass password
 	 * 	@param string $db   database name
@@ -86,7 +86,17 @@ class NewDao{
 	 * @static
 	 * @return bool true if connection was successful;
 	 */
-	static public function connect($type,$host,$user,$pass,$db){
+	static public function connect($type,$host,$user=false,$pass=false,$db=false){
+		if ($user==false && file_exists($host)){
+			$db = new IniObject($host);
+			if (!isset($db->user) || !isset($db->password) || !isset($db->database) || !isset($db->host)) 
+				throw new NewDaoException("Ini File Does Not contain all required definitions");
+			$host = $db->host;
+			$user = $db->user;
+			$pass = $db->password;
+			$db   = $db->database;
+		}elseif (!$user || !$pass || !$db) throw new NewDaoException("not all required variables were set");
+		
 		switch ($type){
     		case "mysql":
     			$link = mysql_connect($host,$user,$pass);
@@ -168,12 +178,17 @@ class NewDao{
 	
 	/**
 	 * sets the logging function
-	 * 	@param string $func name of logging function
+	 * 	@param string|array $func name of logging function|a pair of class and static method to use for logging (array('class','method'))
 	 * @access public
 	 * @static
 	 */
 	static public function setLogger($func){
-		if (!function_exists($func)) throw new NewDaoException("Function $func does not exists");
+		if (is_array($func)){
+			if (!method_exists($func[0],$func[1]))
+				throw new NewDaoException("Function {$func[0]}::{$func[1]} does not exists");
+		}elseif (is_string($func)){
+			if (!function_exists($func)) throw new NewDaoException("Function $func does not exists");
+		}else throw new NewDaoException('Spplied Paramater is not a function');
 		self::$_logger = $func;
 	}
 

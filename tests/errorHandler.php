@@ -65,7 +65,7 @@ function TF_Exception_Handler($ex){
 	
 	$stack = $ex->getTrace();	
 	
-	$error = "\nUncaught-Exception: <<<[ "
+	$error = "\nUncaught-Exception::".get_class($ex)." <<<[ "
 			.$ex->getMessage()." ]>>>\n"
 			."On Line: {$ex->getLine()} "
 			."On File: {$ex->getFile()} "
