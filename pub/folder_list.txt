@@ -1,6 +1,8 @@
 ../classes/library/
 ../classes/library/userAtuh/
 ../classes/library/models/
+../classes/library/controllers/
 ../classes/library/data_access/
 ../classes/app/
 ../classes/app/models/
+../classes/app/controllers/
