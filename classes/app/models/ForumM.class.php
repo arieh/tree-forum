@@ -135,7 +135,7 @@ class ForumM extends TFModel{
 					),
 					$log)>0
 		);
-    	if (in_array($this->getAction,$no_ids)){
+    	if (in_array($this->getAction(),$no_ids)){
     		$globalBlock =( 
     			NewDao::getInstance()
     				->countFields(
@@ -357,8 +357,9 @@ class ForumM extends TFModel{
     	}
     	
     	if ($dbug) fb('Setting Forum Restrictions','line '.__LINE__);
-    	if ($restrict) $this->setRestricted($this->getId(),false,$dbug);
     	if ($closed)   $this->setRestricted($this->getId(),true,$dbug);
+    	elseif ($restrict) $this->setRestricted($this->getId(),false,$dbug);
+    	
     	
     	$perms = $this->getOption('forum-permisions');
     	

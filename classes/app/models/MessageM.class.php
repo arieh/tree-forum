@@ -129,7 +129,7 @@ class MessageM extends TFModel{
 					),
 					$log)>0
 		);
-    	if (in_array($this->getAction,$no_ids)){
+    	if (in_array($this->getAction(),$no_ids)){
     		$globalBlock =( 
     			NewDao::getInstance()
     				->countFields(
