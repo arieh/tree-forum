@@ -1,11 +1,11 @@
 <?php
 class ForumC extends TFController{
 	
-	protected $_models = array('ForumM');
-    
     protected $_model_name = 'ForumM';
     
     protected $_template_dir = 'forum';
+    
+    protected $_action = 'open';
     
     protected $_default_tpl_folder = 'open';
     
@@ -17,7 +17,6 @@ class ForumC extends TFController{
 	
     protected function setOptions(){
     	if (isset($this->_vars[0])){
-			
 			switch(is_numeric($this->_vars[0])){
 				case (true):
 					$this->setOption('id',$this->_vars[0]);
