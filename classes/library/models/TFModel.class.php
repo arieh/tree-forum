@@ -16,12 +16,6 @@ class TFModel{
 	static private $_TF_MODEL_VERSION = '0.5';
 	
 	/**
-	 * @var NewDao a database handler object
-	 * @access protected
-	 */
-	protected $_link = null;
-	
-	/**
 	 * @var array holder of paramater options
 	 * @access protected
 	 */
@@ -71,8 +65,6 @@ class TFModel{
 	 * @return void 
 	 */
 	public function __construct($options = array()){
-		$this->_link = NewDao::getInstance();	
-		
 		foreach ($options as $name => $value){
 			if (is_string($name)) $this->setOption($name,$value);
 		}
@@ -292,6 +284,12 @@ class TFModel{
 				$singular = (substr($pVar,-1)=='s') ? substr($pVar,1,(strlen($pVar)-2)) : $pVar;
 				return (is_array($this->$pVar) && $mr) ? new ModelResult($this->$pVar,$singular) : $this->$pVar;
 			break;
+		}
+	}
+	
+	public function __get($name){
+		if ($name == '_link'){
+			$this->_link = NewDao::getInstance();
 		}
 	}
 	
