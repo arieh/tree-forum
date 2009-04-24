@@ -44,7 +44,7 @@ class keyHandler {
      * 
      * @access public
      */
-    public function __construct(&$link,$ini=''){
+    public function __construct($link,$ini=''){
     	$this->_dba = new userAuthDba($link,$ini);
     	
     	$ip = getenv('REMOTE_ADDR');
