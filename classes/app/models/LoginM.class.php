@@ -94,7 +94,7 @@ class LoginM extends TFModel{
 		}
 		
 		$name = $this->getOption('user-name');
-		if (!is_string($name) || strlen($name)<2 || $this->doesNameExists($name,$this->isDebug())==false) $this->setError('badName');
+		if (!is_string($name) || strlen($name)<2 || $this->doesUserExists($name,$this->isDebug())==false) $this->setError('badName');
 		
 		$hash  = $this->getOption('hash');
 		if (!is_string($hash) || strlen($hash)<40) $this->setError('badHash');
@@ -102,6 +102,8 @@ class LoginM extends TFModel{
 		$encoded = ($this->isOptionSet('encoded')) ? (bool)$this->getOption('encoded') : true;
 		
 		if ($this->isError()) return;
+		
+		$this->setHandler();
 		
 		if ($this->_handler->authenticate($name,$hash,$encoded)){
 			TFUser::setId($this->retrieveUserId($name,$this->isDebug()));
