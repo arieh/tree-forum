@@ -42,6 +42,7 @@ class TFRouter {
 			elseif (is_string($var)){
 				if ($gpc) stripslashes($var);
 				$var = urldecode($var);
+				$var = htmlentities($var);
 			}
 		} 
 	}
