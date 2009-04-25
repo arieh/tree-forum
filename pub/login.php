@@ -19,6 +19,7 @@ $login->execute();
 		<title>Login Page</title>
 	</head>
 	<body>
+		 use username:arieh/ pass:12345
 		 <form id='login-form' action="user/login" method='post'>
 		 <fieldset>
 		 <dl>
