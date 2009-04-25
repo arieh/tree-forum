@@ -1,12 +1,12 @@
 <?php
-abstract class TFModelException extends Exception{}
+class TFModelException extends Exception{}
 
 /*
  * paramaters:
  * 	- permissions (array) a list of permissions ids the current user has
  * 	- actions (string)   current action
  */
-class TFModel{
+abstract class TFModel{
 	
 	/**
 	 * @param string class version

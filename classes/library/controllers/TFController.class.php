@@ -84,7 +84,7 @@ abstract class TFController {
     	$this->_vars = $vars;
     	$this->_view = $view;
     	
-    	$this->setOption('user',TFUser::getId());
+    	$this->setOption('user',TFUser::getInstance()->getId());
     	$this->setOption('permissions',TFUser::getInstance()->getPermissionIds(false));
     	if (defined('_DEBUG_')) $this->setOption('debug',_DEBUG_);
     	
