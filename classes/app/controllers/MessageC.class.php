@@ -9,22 +9,27 @@ class MessageC extends MainController{
     
     protected $_default_tpl_folder = 'open';
     
-    protected $_tpl_folders = array('view','add','edit','move','remove');
+    protected $_tpl_folders = array('view','add','edit','move','remove','new');
     
     protected $_envs = array('xhtml');
     
     protected $_def_env = 'xhtml';
     
     protected function setOptions(){
-    	if (isset($this->_vars[0])){
-			switch(is_numeric($this->_vars[0])){
-				case (true):
-					$this->setOption('id',$this->_vars[0]);
-				break;
-				case (false):
-					$this->setOption('name',$this->_vars[0]);
-				break;
-			}
+    	if (isset($this->_vars[0]) && is_numeric($this->_vars[0])){
+			$this->setOption('id',array_shift($this->_vars));
+		}
+		
+		switch ($this->_action){
+			case 'new':
+				if (isset($this->_vars[0])){
+					while (count($this->_vars)>0){
+						$name=array_shift($this->_vars);
+						$value = array_shift($this->_vars);
+						$this->setOption($name,$value);
+					}
+				}	
+			break;
 		}
 		
 		parent::setOptions();
