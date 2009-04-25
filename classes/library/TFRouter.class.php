@@ -19,11 +19,13 @@ class TFRouter {
 		$savant = new Savant3();
 		$savant->addPath('template',$view_conf->base_dir . $view_conf->templates);
 		$savant->assign('bPath',$view_conf->base_path);
+		
 		if (strlen($route)>0){
 			if (substr($route,-1)!='/') $route.='/';
 			$route = explode($route,$_SERVER['REQUEST_URI']);
 			$route = $route[1];	
 		}
+		
 		$inputs = array($_GET,$_POST,$_COOKIE);
 		foreach ($inputs as $input) self::correctInput($input);
 		$route = explode('/',$route);
@@ -72,7 +74,7 @@ class TFRouter {
 	
 	static public function getEnv(){
 		return self::$_env;
-	}
+	}	
 }
 
 class TFRouterException extends Exception {}
