@@ -392,7 +392,7 @@ class UserM extends TFModel{
 		if (!is_string($hash) || strlen($hash)<40) $this->setError('badHash');
 		
 		$encoded = ($this->isOptionSet('encoded')) ? (bool)$this->getOption('encoded') : true;
-		
+
 		if ($this->isError()) return;
 		
 		$this->setHandler();
