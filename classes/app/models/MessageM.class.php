@@ -59,7 +59,7 @@ class MessageM extends TFModel{
 	/**
 	 * @see <Model.class.php>
 	 */
-	protected $_actions = array('view'=>'openMessage','add'=>'addMessage','edit'=>'editMessage','move'=>'moveMessage','remove'=>'removeMessage');
+	protected $_actions = array('new'=>'newMessage','view'=>'openMessage','add'=>'addMessage','edit'=>'editMessage','move'=>'moveMessage','remove'=>'removeMessage');
 	
 	/**
 	 * @param int message id
@@ -78,6 +78,12 @@ class MessageM extends TFModel{
 	 * @access protected
 	 */
 	protected $_messages = array();
+	
+	protected $_parent = 0;
+	
+	protected $_base = true;
+	
+	protected $_parent_message = array();
 	
 	/**
 	 * @param string message title
@@ -118,6 +124,7 @@ class MessageM extends TFModel{
      */
     private function doesHavepermission($action,$permission,$log=false){
     	$no_ids = array('create');
+    	if ($action=='new') $action='add';
     	$globalPermission = (
     		NewDao::getInstance()
     			->countFields(
@@ -189,7 +196,9 @@ class MessageM extends TFModel{
     			
     		break;
     		case 'add':
+    		case 'new':
     			$forum_id = $this->getOption('forum');
+    			fb($forum_id);
     			if (!$forum_id || !is_numeric($forum_id)) throw new MessageMException('bad forum id');
     			$this->_id = $this->getOption('id');
     			$this->_forum_id = $forum_id;
@@ -225,14 +234,14 @@ class MessageM extends TFModel{
 			if (!$base && !$this->getOption('parent')) throw new MessageMException('parent id must be supplied');
 		
 		//parent validation
-			$parent = $this->getOption('parent');
+			$this->_parent = $parent = $this->getOption('parent');
 			if ($parent && $this->doesMessageExists($parent,$forum)==false) throw new MessageMException('parent is not a valid id in this forum:'.$parent);
 			
 		//title and message validation
 			$title = $this->getOption('title');
 			$message = $this->getOption('message');
 			$user = $this->getOption('user');
-			
+			fb($user);
 			if (!$title || !is_string($title) || strlen($title)<2) $this->setError('shortTitle');
 			if (!$message || !is_string($message) || strlen($message)<2) $this->setError('shortContent');
 			
@@ -323,7 +332,7 @@ class MessageM extends TFModel{
 				'base'=>0,
 				'posted'=>'NOW()',
 				'last_update'=>'NOW()',
-				'user_id'=>0
+				'user_id'=>$user
 				),
 				$log
 			);
@@ -574,6 +583,16 @@ class MessageM extends TFModel{
     		NewDao::getInstance()->delete('messages',array('id'=>$child['id']),$dbug);
     	}
     	NewDao::getInstance()->delete('messages',array('id'=>$id),$dbug);
+    }
+    
+    protected function newMessage(){
+    	$this->_base = $this->getOption('base');
+    	$this->_parent = $this->getOption('parent');
+    	if (!$this->_parent) $this->_base = true;
+    	else{
+    		if ($this->doesMessageExists($this->_parent)==false) throw new MessageMException('bad parent id: '.$this->_parent);
+    		$this->_parent_message = $this->retrieveMessageInfo($this->_parent,$this->isDebug());
+    	}
     }
 }
 
