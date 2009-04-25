@@ -34,6 +34,16 @@ class MessageC extends MainController{
 		
 		parent::setOptions();
     }
+    
+    protected function executeBefore(){
+    	switch ($this->_action){
+    		case 'view':
+    			$this->addTitle($this->_model->getTitle());
+    			$this->addCSS('view_message');
+    		break;
+    	}
+    	parent::executeBefore();
+    }
 }
 
 class MessageCException extends MainControllerException{}

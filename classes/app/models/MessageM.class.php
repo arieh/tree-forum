@@ -89,13 +89,13 @@ class MessageM extends TFModel{
 	 * @param string message title
 	 * @access private
 	 */
-	private $_title = '';
+	protected $_title = '';
 	
 	/**
 	 * @param string message content
 	 * @access private
 	 */
-	private $_content = '';
+	protected $_content = '';
 	
 	/**
 	 * @param bool whether or not edit shoudl be restricted to the user who submitted it or to allow editors/admin to edit as well
