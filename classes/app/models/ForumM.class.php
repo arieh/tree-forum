@@ -122,7 +122,6 @@ class ForumM extends TFModel{
      * @return bool
      */
     private function doesHavePermission($action,$permission,$log=false){
-    	fb('in2');
     	$no_ids = array('create');
     	$globalPermission = (
     		NewDao::getInstance()

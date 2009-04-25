@@ -205,7 +205,7 @@ class MessageM extends TFModel{
 	 * @return bool 
 	 */
 	private function retrieveForumId($id,$log=false){
-		$res = $this->_link->select('messages',array('forum_id'),array('id'=>$id),true,$log);
+		$res = NewDao::getInstance()->select('messages',array('forum_id'),array('id'=>$id),true,$log);
 		return (int)$res['forum_id'];
 	}
 	
@@ -253,7 +253,7 @@ class MessageM extends TFModel{
 	 * @return bool
 	 */
 	private function doesForumExists($forum,$log=false){
-		return ($this->_link->countFields('forums',array('id'=>$forum),$log)>0);
+		return (NewDao::getInstance()->countFields('forums',array('id'=>$forum),$log)>0);
 	}
 	
 	/**
@@ -265,8 +265,8 @@ class MessageM extends TFModel{
 	 * @return bool
 	 */
 	private function doesMessageExists($id,$forum=false,$log=false){
-		if ($forum) return ($this->_link->countFields('messages',array('forum_id'=>$forum,'id'=>$id),$log)>0);
-		return ($this->_link->countFields('messages',array('id'=>$id),$log)>0);
+		if ($forum) return (NewDao::getInstance()->countFields('messages',array('forum_id'=>$forum,'id'=>$id),$log)>0);
+		return (NewDao::getInstance()->countFields('messages',array('id'=>$id),$log)>0);
 	}
 	
 	/**
@@ -278,7 +278,7 @@ class MessageM extends TFModel{
 	 * @access private
 	 */
 	private function postBaseMessage($forum,$title,$message,$user=0,$log=false){
-		$this->_link->insert(
+		NewDao::getInstance()->insert(
 			'messages',
 			array(
 				'forum_id'=>$forum,
@@ -289,11 +289,11 @@ class MessageM extends TFModel{
 				),
 			$log
 		);
-		$id = $this->_id = $this->_link->getLastId();
+		$id = $this->_id = NewDao::getInstance()->getLastId();
 		
-		$this->_link->update('messages',array('dna'=>$id,'root_id'=>$id),array('id'=>$id),$log);
+		NewDao::getInstance()->update('messages',array('dna'=>$id,'root_id'=>$id),array('id'=>$id),$log);
 		
-		$this->_link->insert(
+		NewDao::getInstance()->insert(
 			'message_contents',
 			array(
 				'message_id'=>$id,
@@ -316,7 +316,7 @@ class MessageM extends TFModel{
 	 */
 	private function postSubMessage($forum,$parent,$title,$message,$user=0,$log=false){
 		$parentIds = $this->retrieveMessageIds($parent,$log);
-		$this->_link->insert(
+		NewDao::getInstance()->insert(
 			'messages',
 			array(
 				'forum_id'=>$forum,
@@ -327,14 +327,14 @@ class MessageM extends TFModel{
 				),
 				$log
 			);
-		$id = $this->_id = $this->_link->getLastId();
+		$id = $this->_id = NewDao::getInstance()->getLastId();
 		
 		$dna = $parentIds['dna'].".".$id;
 		$root = $parentIds['root_id'];
 		
-		$this->_link->update('messages',array('dna'=>$dna,'root_id'=>$root),array('id'=>$id),$log);
+		NewDao::getInstance()->update('messages',array('dna'=>$dna,'root_id'=>$root),array('id'=>$id),$log);
 		
-		$this->_link->insert(
+		NewDao::getInstance()->insert(
 				'message_contents',
 				array(
 					'message_id'=>$id,
@@ -344,7 +344,7 @@ class MessageM extends TFModel{
 				),
 				$log
 		); 
-		$this->_link->update('messages',array('last_update'=>'NOW()'),array('id'=>$root),$this->isDebug());
+		NewDao::getInstance()->update('messages',array('last_update'=>'NOW()'),array('id'=>$root),$this->isDebug());
 	}
 	
 	/**
@@ -354,7 +354,7 @@ class MessageM extends TFModel{
 	 * @return array
 	 */
 	private function retrieveMessageIds($id,$log=false){
-		return $this->_link->select('messages',array('forum_id','root_id','dna','id'),array('id'=>$id),true,$log);
+		return NewDao::getInstance()->select('messages',array('forum_id','root_id','dna','id'),array('id'=>$id),true,$log);
 	}
 	
 	/**
@@ -397,7 +397,7 @@ class MessageM extends TFModel{
 			$query->createCondition('messages','id','=',$id)
 		);
 		
-		$res = $this->_link->queryArray($query->generate(),$log);
+		$res = NewDao::getInstance()->queryArray($query->generate(),$log);
 		return $res[0];
 	}
 	
@@ -423,7 +423,7 @@ class MessageM extends TFModel{
 			$query->createCondition('messages','dna','LIKE',$dna.".%")
 		);
 		
-		$messages = $this->_link->queryArray($query->generate(),$log);
+		$messages = NewDao::getInstance()->queryArray($query->generate(),$log);
 		foreach ($messages as $msg) $this->_messages[$msg['dna']] = $msg;
 	}
 	
@@ -468,12 +468,12 @@ class MessageM extends TFModel{
     		return false;
     	};
     	
-    	$this->_link->update('message_contents',array('message'=>$content,'non-html'=>strip_tags($content)),array('message_id'=>$id),$this->isDebug()); 
+    	NewDao::getInstance()->update('message_contents',array('message'=>$content,'non-html'=>strip_tags($content)),array('message_id'=>$id),$this->isDebug()); 
     }
     
     private function isUserAllowedToEdit($id,$selfEdit,$log=false){
     	if ($selfEdit==false) return true;
-    	return ($this->_link->countFields('messages',array('id'=>$this->getId(),'user_id'=>$id),$log)>0);
+    	return (NewDao::getInstance()->countFields('messages',array('id'=>$this->getId(),'user_id'=>$id),$log)>0);
     }
     
     /**
@@ -510,11 +510,11 @@ class MessageM extends TFModel{
 		}
 		
 		foreach ($newRecords as $record){
-			$this->_link->update('messages',array('dna'=>$record['dna'],'root_id'=>$new_root),array('id'=>$record['id']),$this->isDebug());
+			NewDao::getInstance()->update('messages',array('dna'=>$record['dna'],'root_id'=>$new_root),array('id'=>$record['id']),$this->isDebug());
 		} 
 		 
 		if ($base){
-			$this->_link->update('messages',array('base'=>true),array('id'=>$id),$this->isDebug());
+			NewDao::getInstance()->update('messages',array('base'=>true),array('id'=>$id),$this->isDebug());
 		} 		
     }
     
@@ -525,7 +525,7 @@ class MessageM extends TFModel{
      * @access private
      */
     private function retrieveDna($id,$log=false){
-    	$res = $this->_link->select('messages',array('dna'),array('id'=>$id),true,$log);
+    	$res = NewDao::getInstance()->select('messages',array('dna'),array('id'=>$id),true,$log);
     	return $res['dna'];
     }
     
@@ -536,7 +536,7 @@ class MessageM extends TFModel{
      * @access private
      */
     private function retrieveRoot($id,$log=false){
-    	$res = $this->_link->select('messages',array('root_id'),array('id'=>$id),true,$log);
+    	$res = NewDao::getInstance()->select('messages',array('root_id'),array('id'=>$id),true,$log);
     	return $res['root_id'];
     }
     
@@ -556,7 +556,7 @@ class MessageM extends TFModel{
 			$query->createCondition('messages','dna','LIKE',$dna.".%")
 		);
 		
-		return $this->_link->queryArray($query->generate(),$log);
+		return NewDao::getInstance()->queryArray($query->generate(),$log);
     }
     
     /**
@@ -571,9 +571,9 @@ class MessageM extends TFModel{
     	$children = $this->retrieveChildrenIds($dna,$dbug);
     	
     	foreach ($children as $child){
-    		$this->_link->delete('messages',array('id'=>$child['id']),$dbug);
+    		NewDao::getInstance()->delete('messages',array('id'=>$child['id']),$dbug);
     	}
-    	$this->_link->delete('messages',array('id'=>$id),$dbug);
+    	NewDao::getInstance()->delete('messages',array('id'=>$id),$dbug);
     }
 }
 

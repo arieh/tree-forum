@@ -1,6 +1,6 @@
 <?php
 
-class MessageC extends TFController{
+class MessageC extends MainController{
 	protected $_models = array('MessageM');
     
     protected $_model_name = 'MessageM';
