@@ -1,6 +1,6 @@
 <?php
 
-class UserC extends TFController{
+class UserC extends MainController{
     protected $_model_name = 'UserM';
     
     protected $_template_dir = 'user';

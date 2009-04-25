@@ -88,9 +88,8 @@ class ForumM extends TFModel{
 	/**
      * @see <Model.class.php>
      */
-    protected function checkpermission(){
-    	
-    	if ($this->doesHavepermissions()==false){
+    protected function checkPermission(){
+    	if ($this->doesHavePermissions()==false){
     		$this->setError('noPermission');
     		return false;
     	}
@@ -107,8 +106,8 @@ class ForumM extends TFModel{
     		return false;
     	}
 		    	
-    	while ($permission = $this->getpermission()){
-    		if ($this->doesHavepermission($action,$permission,true)) return true;
+    	while ($permission = $this->getPermission()){
+    		if ($this->doesHavePermission($action,$permission,true)) return true;
     	}
     	$this->setError('noPermission');
     	return false;
@@ -122,7 +121,8 @@ class ForumM extends TFModel{
      * @access private
      * @return bool
      */
-    private function doesHavepermission($action,$permission,$log=false){
+    private function doesHavePermission($action,$permission,$log=false){
+    	fb('in2');
     	$no_ids = array('create');
     	$globalPermission = (
     		NewDao::getInstance()
@@ -510,7 +510,7 @@ class ForumM extends TFModel{
      * 	@param bool $log log queries?
      * @access private
      */
-    private function addpermissions($pers,$log=false){
+    private function addPermissions($pers,$log=false){
     	foreach ($pers as $per){
     		$per_id = $per['permission_id'];
     		if (!$this->doespermissionExists($per_id,$log)) throw new FormMException("permission $per does not exist");

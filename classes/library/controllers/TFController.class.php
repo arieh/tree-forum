@@ -85,14 +85,14 @@ abstract class TFController {
     	$this->_view = $view;
     	
     	$this->setOption('user',TFUser::getId());
-    	$this->setOption('permisions',TFUser::getInstance()->getPermissionIds(false));
+    	$this->setOption('permissions',TFUser::getInstance()->getPermissionIds(false));
     	if (defined('_DEBUG_')) $this->setOption('debug',_DEBUG_);
     	
     	$this->setOptions();
     	
-    	$this->executeBefore();
-    	
     	$this->setModel();
+    	
+    	$this->executeBefore();
     	
     	$this->setView();
     	
@@ -102,13 +102,13 @@ abstract class TFController {
     }
     
     /**
-     * a helper method, used to let develpors run operations before calling main model and view
+     * a helper method, used to let develpors run operations before calling main view
      * @access protected
      */
     protected function executeBefore(){}
     
     /**
-     * a helper method, used to let develpors run operations after calling main model and view
+     * a helper method, used to let develpors run operations after calling main view
      * @access protected
      */
     protected function executeAfter(){}

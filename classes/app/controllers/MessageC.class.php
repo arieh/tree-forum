@@ -31,4 +31,4 @@ class MessageC extends TFController{
     }
 }
 
-class MessageCException extends TFControllerException{}
+class MessageCException extends MainControllerException{}

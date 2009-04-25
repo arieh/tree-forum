@@ -1,5 +1,5 @@
 <?php
-class ForumC extends TFController{
+class ForumC extends MainController{
 	
     protected $_model_name = 'ForumM';
     
@@ -38,6 +38,23 @@ class ForumC extends TFController{
 		
 		parent::setOptions();
     }
+    
+    protected function executeBefore(){
+    	$this->addTitle('Forum');
+    	switch ($this->_action){
+    		case 'open':
+    			$this->addTitle($this->_model->getName());
+    			$this->addCSS('open_forum');
+    		break;
+    		case 'create':
+    			$this->addTitle('add');
+    			$this->addCSS('create_forum');
+    			$this->addJS('create_forum');
+    		break;
+    	}
+    	
+    	parent::executeBefore();
+    }
 }
 
-class ForumCException extends TFControllerException{}
+class ForumCException extends MainControllerException{}
