@@ -248,7 +248,7 @@ class ForumM extends TFModel{
     	
     	$query->limit($start,$limit);
     	$query->orderBy('messages','last_update');
-    	$query->orderDesc();
+    	$query->orderAsc();
     	
     	$roots = NewDao::getInstance()->queryArray($query->generate(),$log);
 		$ids = array();
