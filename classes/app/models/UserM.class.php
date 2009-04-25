@@ -72,13 +72,13 @@ class UserM extends TFModel{
 	/**
 	 * @see <TFModel.class.php>
 	 */
-	protected function checkPermision(){
+	protected function checkpermission(){
 		$free = array('login','logout','generate','open');
 		$action = $this->getAction();
 		
 		if (in_array($action,$free)) return true;
 		
-		$perms = $this->getPermisions(false);
+		$perms = $this->getpermissions(false);
 		
 		$dbug = $this->isDebug();
 		
@@ -113,14 +113,14 @@ class UserM extends TFModel{
 		switch($action){
 			case 'create':
 			case 'open':
-				$table = 'user_permissions';
+				$table = 'user_actions';
 			break;
 			case 'add-permission':
 			case 'remove-permission':
-				$table = 'forum_permisions';
+				$table = 'forum_actions';
 		}
 		return (NewDao::getInstance()
-					->countFields($table,array('permision_id'=>$perm,$action=>1),$log)>0);
+					->countFields($table,array('permission_id'=>$perm,$action=>1),$log)>0);
 	}
 	
 	/**
@@ -243,7 +243,7 @@ class UserM extends TFModel{
 	private function setPermissions($id,$perms,$log=false){
 		$ins = NewDao::getInstance();
 		foreach ($perms as $perm){
-			$ins->insert('users_permisions',array('user_id'=>$id,'permision_id'=>$perm),$log);
+			$ins->insert('user_permissions',array('user_id'=>$id,'permission_id'=>$perm),$log);
 		}
 	}
 	

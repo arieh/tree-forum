@@ -31,7 +31,7 @@ class ForumM extends TFModel{
 	);
 	
 	/**
-	 * @param array allowed permisions for messages.
+	 * @param array allowed permissions for messages.
 	 * @access private
 	 */
 	 private $_message_actions =  array('view','add','edit','remove','move');
@@ -88,10 +88,10 @@ class ForumM extends TFModel{
 	/**
      * @see <Model.class.php>
      */
-    protected function checkPermision(){
+    protected function checkpermission(){
     	
-    	if ($this->doesHavePermisions()==false){
-    		$this->setError('noPermision');
+    	if ($this->doesHavepermissions()==false){
+    		$this->setError('noPermission');
     		return false;
     	}
     		
@@ -103,34 +103,34 @@ class ForumM extends TFModel{
     	}
     	
     	if ($this->isError()){
-    		$this->setError('noPermision');
+    		$this->setError('noPermission');
     		return false;
     	}
 		    	
-    	while ($permision = $this->getPermision()){
-    		if ($this->doesHavePermision($action,$permision,true)) return true;
+    	while ($permission = $this->getpermission()){
+    		if ($this->doesHavepermission($action,$permission,true)) return true;
     	}
-    	$this->setError('noPermision');
+    	$this->setError('noPermission');
     	return false;
     }
     
     /**
-     * checks if a specific permision id is allowed for this specific action
+     * checks if a specific permission id is allowed for this specific action
      * 	@param string $action current action
-     * 	@param int $permision a permision id
+     * 	@param int $permission a permission id
      * 	@param bool logg queries?
      * @access private
      * @return bool
      */
-    private function doesHavePermision($action,$permision,$log=false){
+    private function doesHavepermission($action,$permission,$log=false){
     	$no_ids = array('create');
     	$globalPermission = (
     		NewDao::getInstance()
     			->countFields(
-					'forum_permisions',
+					'forum_actions',
 					array(
 						$action=>1,
-						'permision_id'=>$permision,
+						'permission_id'=>$permission,
 						'forum_id'=>0
 					),
 					$log)>0
@@ -139,7 +139,7 @@ class ForumM extends TFModel{
     		$globalBlock =( 
     			NewDao::getInstance()
     				->countFields(
-						'forum_permisions',
+						'forum_actions',
 						array(
 							$action=>0,
 							'forum_id'=>$this->getId()
@@ -149,10 +149,10 @@ class ForumM extends TFModel{
     		$specificPermission = (
     			NewDao::getInstance()
     				->countFields(
-						'forum_permisions',
+						'forum_actions',
 						array(
 							$action=>1,
-							'permision_id'=>$permision,
+							'permission_id'=>$permission,
 							'forum_id'=>$this->getId()
 						),
 						$log)>0
@@ -361,11 +361,11 @@ class ForumM extends TFModel{
     	elseif ($restrict) $this->setRestricted($this->getId(),false,$dbug);
     	
     	
-    	$perms = $this->getOption('forum-permisions');
+    	$perms = $this->getOption('forum-permissions');
     	
     	if (is_array($perms) && count($perms)>0){
     		if ($dbug) fb('Setting Additional Permissions','line '.__LINE__);
-    		$this->addPermisions($perms,$this->isDebug());
+    		$this->addpermissions($perms,$this->isDebug());
     	}
     }
     
@@ -389,7 +389,7 @@ class ForumM extends TFModel{
     private function setAdmins($ids,$log=false){
     	$adminPermission = $this->getAdminPermission();
     	foreach ($ids as $id)
-    		NewDao::getInstance()->insert('users_permisions',array('user_id'=>$id,'permision_id'=>$adminPermission),$log);
+    		NewDao::getInstance()->insert('user_permissions',array('user_id'=>$id,'permission_id'=>$adminPermission),$log);
     }
     
     /**
@@ -401,7 +401,7 @@ class ForumM extends TFModel{
     private function setEditors($ids,$log=false){
     	$editorPermission = $this->getEditorPermission();
     	foreach ($ids as $id)
-    		NewDao::getInstance()->insert('users_permisions',array('user_id'=>$id,'permision_id'=>$editorPermission),$log);
+    		NewDao::getInstance()->insert('user_permissions',array('user_id'=>$id,'permission_id'=>$editorPermission),$log);
     }
     
     /**
@@ -413,7 +413,7 @@ class ForumM extends TFModel{
     private function setUsers($ids,$log=false){
     	$userPermission = $this->getUserPermission();
     	foreach ($ids as $id)
-    		NewDao::getInstance()->insert('users_permisions',array('user_id'=>$id,'permision_id'=>$userPermission),$log);
+    		NewDao::getInstance()->insert('user_permissions',array('user_id'=>$id,'permission_id'=>$userPermission),$log);
     }
     
     /**
@@ -423,9 +423,9 @@ class ForumM extends TFModel{
      * @access private
      */
     private function createForumPermissions($id,$log=false){
-    	$admin  = $this->_admin_permission  = NewDao::getInstance()->insert('permisions',array('name'=>$this->getName() . '-admin'),$log);
-    	$editor = $this->_editor_permission = NewDao::getInstance()->insert('permisions',array('name'=>$this->getName() . '-editor'),$log);
-    	$user   = $this->_user_permission   = NewDao::getInstance()->insert('permisions',array('name'=>$this->getName() . '-user'),$log);
+    	$admin  = $this->_admin_permission  = NewDao::getInstance()->insert('permissions',array('name'=>$this->getName() . '-admin'),$log);
+    	$editor = $this->_editor_permission = NewDao::getInstance()->insert('permissions',array('name'=>$this->getName() . '-editor'),$log);
+    	$user   = $this->_user_permission   = NewDao::getInstance()->insert('permissions',array('name'=>$this->getName() . '-user'),$log);
     	
     	$options = array('open'=>1,	'view'=>1, 'create'=>1);
     	
@@ -451,11 +451,11 @@ class ForumM extends TFModel{
     private function retrieveForumPermissions($name,$log=false){
     	$query = NewDao::getGenerator();
     	
-    	$query->addSelect('permisions',array('id','name'));
+    	$query->addSelect('permissions',array('id','name'));
     	
-    	$query->addConditionSet($query->createCondition('permisions','name','=',$name . '-admin'));
-    	$query->addConditionSet($query->createCondition('permisions','name','=',$name . '-editor'));
-    	$query->addConditionSet($query->createCondition('permisions','name','=',$name . '-user'));
+    	$query->addConditionSet($query->createCondition('permissions','name','=',$name . '-admin'));
+    	$query->addConditionSet($query->createCondition('permissions','name','=',$name . '-editor'));
+    	$query->addConditionSet($query->createCondition('permissions','name','=',$name . '-user'));
     	
     	$perms = NewDao::getInstance()->queryArray($query->generate(),$log);
     	
@@ -500,20 +500,20 @@ class ForumM extends TFModel{
     private function doesForumPermissionExists($forum,$permission,$log){
     	return(
     		NewDao::getInstance()
-    		->countFields('forum_permisions',array('forum_id'=>$forum,'permision_id'=>$permission),$log)>0
+    		->countFields('forum_actions',array('forum_id'=>$forum,'permission_id'=>$permission),$log)>0
     	);
     }
     
     /**
-     * adds permisions to the forum
-     * 	@param array $pers an array of permision arrays
+     * adds permissions to the forum
+     * 	@param array $pers an array of permission arrays
      * 	@param bool $log log queries?
      * @access private
      */
-    private function addPermisions($pers,$log=false){
+    private function addpermissions($pers,$log=false){
     	foreach ($pers as $per){
-    		$per_id = $per['permision_id'];
-    		if (!$this->doesPermisionExists($per_id,$log)) throw new FormMException("permision $per does not exist");
+    		$per_id = $per['permission_id'];
+    		if (!$this->doespermissionExists($per_id,$log)) throw new FormMException("permission $per does not exist");
     		
 			$fields = array();     		
     		foreach($per as $name=>$value){
@@ -525,20 +525,20 @@ class ForumM extends TFModel{
     				 
     		}
     		$fields['forum_id'] = $this->getId();
-    		$fields['permision_id'] = $per_id;
-    		NewDao::getInstance()->insert('forum_permisions',$fields,$log); 
+    		$fields['permission_id'] = $per_id;
+    		NewDao::getInstance()->insert('forum_actions',$fields,$log); 
     	}
     }
     
     /**
-     * checks if a specific permision exists
-     * 	@param int $per permision id
+     * checks if a specific permission exists
+     * 	@param int $per permission id
      * 	@param bool $log log queries?
      * @access private
 	 * @return bool
      */
-    private function doesPermisionExists($per,$log=false){
-    	return (NewDao::getInstance()->countFields('permisions',array('id'=>$per),$log)>0);
+    private function doespermissionExists($per,$log=false){
+    	return (NewDao::getInstance()->countFields('permissions',array('id'=>$per),$log)>0);
     }
 	
 	/**
@@ -688,10 +688,10 @@ class ForumM extends TFModel{
 	
 	private function deleteForumPermission($forum,$perm,$log=false){
    		NewDao::getInstance()->delete(
-   			'forum_permisions',
+   			'forum_actions',
    			array(
 				'forum_id'=>$forum,
-				'permision_id'=>$perm
+				'permission_id'=>$perm
 			),
 			$log
    		);
@@ -700,8 +700,8 @@ class ForumM extends TFModel{
 	private function insertForumPermission($forum,$perm,$options=array(),$log=false){
 		if (!is_array($options)) $options=array();
 		$options['forum_id']=$forum;
-		$options['permision_id']=$perm;
-		NewDao::getInstance()->insert('forum_permisions',$options,$log);
+		$options['permission_id']=$perm;
+		NewDao::getInstance()->insert('forum_actions',$options,$log);
 	}
 }
 

@@ -63,8 +63,8 @@ class TFUserM extends TFModel{
      */
     private function retrievePermissionIds(){
     	$id = $this->getId();
-    	$perms = NewDao::getInstance()->select('users_permisions',array('permision_id'),array('user_id'=>$id),false,$this->isDebug());
-    	foreach ($perms as $per) $this->_permission_ids[]=$per['permision_id'];
+    	$perms = NewDao::getInstance()->select('user_permissions',array('permission_id'),array('user_id'=>$id),false,$this->isDebug());
+    	foreach ($perms as $per) $this->_permission_ids[]=$per['permission_id'];
     }
     
     private function doesUserExist($id){

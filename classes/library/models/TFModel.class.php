@@ -3,7 +3,7 @@ class TFModelException extends Exception{}
 
 /*
  * paramaters:
- * 	- permisions (array) a list of permisions ids the current user has
+ * 	- permissions (array) a list of permissions ids the current user has
  * 	- actions (string)   current action
  */
 class TFModel{
@@ -46,10 +46,10 @@ class TFModel{
 	protected $_action = false;
 	
 	/**
-	 * @param array a set of current permision ids
+	 * @param array a set of current permission ids
 	 * @access protected
 	 */
-	protected $_permisions = array();
+	protected $_permissions = array();
 	
 	/**
 	 * @param bool debug mode
@@ -73,9 +73,9 @@ class TFModel{
 			$this->setOption('debug',null); 
 		}
 		
-		if ($this->isOptionSet('permisions')){
-			$this->_permisions = $this->getOption('permisions');
-			$this->setOption('permisions',null);
+		if ($this->isOptionSet('permissions')){
+			$this->_permissions = $this->getOption('permissions');
+			$this->setOption('permissions',null);
 		} 
 		$this->setAction();
 	}
@@ -85,8 +85,8 @@ class TFModel{
 	 * @access public
 	 */	
 	public function execute(){
-		if ($this->checkPermision()==false){
-    		$this->setError('noPermision');
+		if ($this->checkpermission()==false){
+    		$this->setError('noPermission');
     		return false;
     	}
 		
@@ -157,37 +157,37 @@ class TFModel{
 	 }
 	 
 	 /**
-	  * get a permision from the permision list
-	  * @return int permision id
+	  * get a permission from the permission list
+	  * @return int permission id
 	  * @access protected
 	  */
-	 protected function getPermision(){
-	 	return array_pop($this->_permisions);
+	 protected function getPermission(){
+	 	return array_pop($this->_permissions);
 	 }
 	 
 	 /**
-	  * gets permision list
+	  * gets permission list
 	  * @access protected
 	  * @return array
 	  */
-	 protected function getPermisions(){
-	 	return $this->_permisions;
+	 protected function getPermissions(){
+	 	return $this->_permissions;
 	 }
 	 
 	 /**
-	  * checks if any permisions were set
+	  * checks if any permissions were set
 	  *	@access protected
 	  *	@return bool
 	  */
-	 protected function doesHavePermisions(){
-	 	return (count($this->_permisions)>0);
+	 protected function doesHavePermissions(){
+	 	return (count($this->_permissions)>0);
 	 }
 	 
 	/**
-	 * checks if a specific user has permision to access the page
+	 * checks if a specific user has permission to access the page
 	 * @return bool
 	 */
-	protected function checkPermision(){return true;}
+	protected function checkPermission(){return true;}
 	
 	/**
 	 * sets an internal error

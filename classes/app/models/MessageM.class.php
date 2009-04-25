@@ -100,31 +100,31 @@ class MessageM extends TFModel{
 	 /**
      * @see <Model.class.php>
      */
-    protected function checkPermision(){
+    protected function checkpermission(){
 		$action = $this->getAction();
-    	while ($perm = $this->getPermision()){
-    				if ($this->doesHavePermision($action,$perm,true)) return true;
+    	while ($perm = $this->getpermission()){
+    				if ($this->doesHavepermission($action,$perm,true)) return true;
     			}
-    			$this->setError('noPermision');
+    			$this->setError('noPermission');
     }
 	
 	/**
-     * checks if a specific permision id is allowed for this specific action
+     * checks if a specific permission id is allowed for this specific action
      * 	@param string $action current action
-     * 	@param int $permision a permision id
+     * 	@param int $permission a permission id
      * 	@param bool logg queries?
      * @access private
      * @return bool
      */
-    private function doesHavePermision($action,$permision,$log=false){
+    private function doesHavepermission($action,$permission,$log=false){
     	$no_ids = array('create');
     	$globalPermission = (
     		NewDao::getInstance()
     			->countFields(
-					'forum_permisions',
+					'forum_actions',
 					array(
 						$action=>1,
-						'permision_id'=>$permision,
+						'permission_id'=>$permission,
 						'forum_id'=>0
 					),
 					$log)>0
@@ -133,7 +133,7 @@ class MessageM extends TFModel{
     		$globalBlock =( 
     			NewDao::getInstance()
     				->countFields(
-						'forum_permisions',
+						'forum_actions',
 						array(
 							$action=>0,
 							'forum_id'=>$this->getForumId()
@@ -143,10 +143,10 @@ class MessageM extends TFModel{
     		$specificPermission = (
     			NewDao::getInstance()
     				->countFields(
-						'forum_permisions',
+						'forum_actions',
 						array(
 							$action=>1,
-							'permision_id'=>$permision,
+							'permission_id'=>$permission,
 							'forum_id'=>$this->getForumId()
 						),
 						$log)>0
@@ -464,7 +464,7 @@ class MessageM extends TFModel{
     	if ($this->isError()) return false;
     	
     	if ($this->isUserAllowedToEdit($user,$this->_editSelfOnly,$this->isDebug()) == false){
-    		$this->setError('noPermision');
+    		$this->setError('noPermission');
     		return false;
     	};
     	
