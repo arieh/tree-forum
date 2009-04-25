@@ -1,6 +1,6 @@
 <?php
 
-class TFController {
+abstract class TFController {
     
     protected $_model = null;
     
@@ -26,10 +26,12 @@ class TFController {
     
     protected $_action = '';
     
+    protected $_output = '';
+    
     public function __construct($vars=array(),$view){
     	if (!defined('_SEP_')) define (_SEP_,DIRECTORY_SEPARATOR); 
     	
-    	if (count($vars)>0){
+    	if (count($vars)>0 && !is_numeric($vars[0])){
     		$this->_action = $this->setOption('action',strtolower(array_shift($vars)));
     	}
     	
@@ -42,26 +44,20 @@ class TFController {
     	
     	$this->setOptions();
     	
-    	$this->execute();
-    	$name = $this->_model_name;
-    	$this->_model = new $name($this->getOptions());
-		
-		$this->_model->execute();	
+    	$this->executeBefore();
     	
-    	$this->_view->assign('model',$this->_model);
-    	if (in_array(TFRouter::getEnv(),$this->_envs)) $folder = TFRouter::getEnv();
-		else $folder = $this->_def_env;
+    	$this->setModel();
+    	
+    	$this->setView();
+    	
+		$this->executeAfter();
 		
-		if (strlen($this->_action)>0 && in_array($this->_action,$this->_tpl_folders)) 
-			$location = $this->_template_dir . _SEP_ . $this->_action . _SEP_ . $folder . _SEP_;
-		else $location = $this->_template_dir . _SEP_ . $this->_default_tpl_folder . _SEP_ . $folder . _SEP_;	
-		
-		$file = (is_null($this->_model) || $this->_model->isError()) ? 'errors.tpl.php' : 'main.tpl.php';
-		$output = $this->_view->fetch($location . $file);
-		print_r($output);
+		echo $this->_output;
     }
     
-    public function execute(){}
+    protected function executeBefore(){}
+    
+    protected function executeAfter(){}
     
     protected function setOption($name,$value){
     	$this->_options[$name]=$value;
@@ -84,6 +80,31 @@ class TFController {
     			$this->setOption($key,$var);
     		}
     	}
+    }
+    
+    protected function setModel(){
+    	$name = $this->_model_name;
+    	
+    	if (!is_subclass_of($name,'TFModel')) throw new TFControllerException('model must be a subclass of TFModel');
+    	
+    	$this->_model = new $name($this->getOptions());
+		
+		$this->_model->execute();	
+    }
+    
+    protected function setView(){
+    	$this->_view->assign('model',$this->_model);
+    	
+    	if (in_array(TFRouter::getEnv(),$this->_envs)) $folder = TFRouter::getEnv();
+		else $folder = $this->_def_env;
+		
+		if (strlen($this->_action)>0 && in_array($this->_action,$this->_tpl_folders)) 
+			$location = $this->_template_dir . _SEP_ . $this->_action . _SEP_ . $folder . _SEP_;
+		else $location = $this->_template_dir . _SEP_ . $this->_default_tpl_folder . _SEP_ . $folder . _SEP_;	
+		
+		$file = ((is_null($this->_model)==false) && $this->_model->isError()) ? 'errors.tpl.php' : 'main.tpl.php';
+		
+		$this->_output .= $this->_view->fetch($location . $file);
     }
 }
 
