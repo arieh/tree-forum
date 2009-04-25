@@ -13,7 +13,7 @@ class TFModel{
 	 * @access private
 	 * @static
 	 */
-	static private $_TF_MODEL_VERSION = '0.5';
+	static private $_TF_MODEL_VERSION = '0.6';
 	
 	/**
 	 * @var array holder of paramater options
