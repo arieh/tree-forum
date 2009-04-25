@@ -73,6 +73,7 @@ class userAuthDba implements dbaInterface {
     	}else{
     		$sql = "UPDATE `temp-keys` SET `key`='$key' WHERE `ip`='$ip'";
     	}
+    	if (_DEBUG_) fb($sql);
     	mysql_query($sql) or die(mysql_error());
     }    
     /**
@@ -87,7 +88,7 @@ class userAuthDba implements dbaInterface {
     	if ($this->keyExists($ip)==false) return false;
     	
     	$sql    = "SELECT `key` FROM `temp-keys` WHERE `ip`='$ip'";
-    	
+    	if (_DEBUG_) fb($sql);
     	$query  = mysql_query($sql,$this->_link) or die(mysql_error());
     	$result = mysql_fetch_assoc($query);
     	return $result['key'];
@@ -108,7 +109,7 @@ class userAuthDba implements dbaInterface {
     	$sql = "SELECT COUNT(*) as `c`
 					FROM `".$dbConfigs['tableName']."`
 					WHERE `".$dbConfigs['nameField']."` = '$name'";
-    	
+    	if (_DEBUG_) fb($sql);
     	$query = mysql_query($sql) or die(mysql_error());
     	$result = mysql_fetch_assoc($query);
     	return ((int)$result['c']>0);
@@ -131,6 +132,7 @@ class userAuthDba implements dbaInterface {
     	$sql = "SELECT `".$dbConfigs['passField']."` as `pass`
 					FROM `".$dbConfigs['tableName']."`
 					WHERE `".$dbConfigs['nameField']."` = '$name'";
+		if (_DEBUG_) fb($sql);
     	$query = mysql_query($sql,$this->_link) or die(mysql_error());
     	$result = mysql_fetch_assoc($query);
     	return $result['pass'];
@@ -138,6 +140,7 @@ class userAuthDba implements dbaInterface {
     
     protected function keyExists($ip){
     	$sql = "SELECT COUNT(*) as `c` FROM `temp-keys` WHERE `ip`='$ip'";
+    	if (_DEBUG_) fb($sql);
     	$query = mysql_query($sql,$this->_link) or die(mysql_error());
     	$result = mysql_fetch_assoc($query);
     	return ((int)$result['c']>0);

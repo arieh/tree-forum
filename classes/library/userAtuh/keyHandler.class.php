@@ -96,10 +96,9 @@ class keyHandler {
     	
     		//make sure password is hashed
     	if (!$sha1) $pass = sha1($pass);
-    	
     		//create a hashed string from the date collected
 		$encoded = sha1(sha1($pass.$name.$key));
-		
+		if (_DEBUG_) fb($encoded,$key);
 			//generate a new key, so the last key won't be usable
 		$this->generateKey();
 		
