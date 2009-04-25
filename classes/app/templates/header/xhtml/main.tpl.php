@@ -16,3 +16,7 @@
 	<?php endforeach;?>
 </head>
 <body>
+<ul class='menu'>
+	<li><a href='<?php echo $this->bPath;?>forum/22'>Open Forum</a></li>
+	<li><a href='<?php echo $this->bPath;?>login.php'>Login Page</a></li>
+</ul>
