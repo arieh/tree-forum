@@ -1,5 +1,5 @@
 <?php
-class TFModelException extends Exception{}
+abstract class TFModelException extends Exception{}
 
 /*
  * paramaters:
