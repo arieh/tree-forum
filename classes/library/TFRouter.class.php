@@ -9,16 +9,8 @@ class TFRouter {
 	
 	static private $_env = 'xhtml';
 	
-	static private $_default_view_conf ='';
-	
 	static public function route($route='',$def_router='',$viewConf=''){
-		self::$_default_view_conf = '..' . DIRECTORY_SEPARATOR . 'configs' . DIRECTORY_SEPARATOR . 'view.ini';
-		
-		$view_conf = (strlen($viewConf)>0 && file_exists($viewConf)) ? new IniObject($viewConf) : new IniObject(self::$_def_view_conf); 
-		
-		$savant = new Savant3();
-		$savant->addPath('template',$view_conf->base_dir . $view_conf->templates);
-		$savant->assign('bPath',$view_conf->base_path);
+		$view = new Savant3View($viewConf);
 		
 		if (strlen($route)>0){
 			if (substr($route,-1)!='/') $route.='/';
@@ -32,11 +24,11 @@ class TFRouter {
 		
 		$controller = ucwords(strtolower(array_shift($route)))."C";
 		if (file_exists("../classes/app/controllers/$controller.class.php")){
-			$control = new $controller($route,$savant);
+			$control = new $controller($route,$view);
 		}
 		
 		if (!isset($control)){
-			if (strlen($def_router)>0 && class_exists($def_router)) $control = new $def_router($route,$savant);
+			if (strlen($def_router)>0 && class_exists($def_router)) $control = new $def_router($route,$view);
 			//elseif (strlen($def_router)>0 && class_exists($this->_default_router)) $control = new {$this->_default_router}($route,$savant);
 		}
 		
