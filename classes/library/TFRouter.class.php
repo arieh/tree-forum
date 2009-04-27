@@ -16,6 +16,9 @@ class TFRouter {
 			if (substr($route,-1)!='/') $route.='/';
 			$route = explode($route,$_SERVER['REQUEST_URI']);
 			$route = $route[1];	
+		}else{
+			$route = $_SERVER['REQUEST_URI'];
+			if ($route{0}=='/') $route = substr($route,1);
 		}
 		
 		$inputs = array($_GET,$_POST,$_COOKIE);
