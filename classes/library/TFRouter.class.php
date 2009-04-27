@@ -20,7 +20,6 @@ class TFRouter {
 			$route = $_SERVER['REQUEST_URI'];
 			if ($route{0}=='/') $route = substr($route,1);
 		}
-		
 		$inputs = array($_GET,$_POST,$_COOKIE);
 		foreach ($inputs as $input) self::correctInput($input);
 		$route = explode('/',$route);
