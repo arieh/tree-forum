@@ -10,7 +10,7 @@ class Savant3View implements TFView{
 		
 		$this->_savant = new Savant3();
 		$this->_savant->addPath('template',$view_conf->base_dir . $view_conf->templates);
-		$this->_savant->assign('bPath',$view_conf->base_path);
+		$this->_savant->assign('bPath',$view_conf->base_address);
 	}
 	
 	public function addPath($type, $path){

@@ -12,5 +12,7 @@ require_once ".." . _SEP_ . "classes" . _SEP_ . "library" . _SEP_ .'firePHP' . _
 NewDao::connect('mysql',".." . _SEP_ . "configs" . _SEP_ . "db.ini");
 NewDao::setLogger(array('FB','log'));
 
-TFRouter::route('forum-example/pub/','',".." . _SEP_ . "configs" . _SEP_ . 'view.ini');
+$conf = new IniObject(".." . _SEP_ . "config" . _SEP_ . "view.ini");
+
+TFRouter::route($conf->base_path,'',$conf);
 ob_flush();
