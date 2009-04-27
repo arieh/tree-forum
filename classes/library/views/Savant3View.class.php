@@ -5,7 +5,8 @@ class Savant3View implements TFView{
 	private $_savant = null;
 	
 	public function __construct($conf=''){
-		$view_conf = (strlen($conf)>0 && file_exists($conf)) ? new IniObject($conf) : new IniObject(DEFAULT_VIEW_CONF_DIR); 
+		if ($conf instanceof IniObject) $view_conf = $view_conf;
+		else $view_conf = (strlen($conf)>0 && file_exists($conf)) ? new IniObject($conf) : new IniObject(DEFAULT_VIEW_CONF_DIR); 
 		
 		$this->_savant = new Savant3();
 		$this->_savant->addPath('template',$view_conf->base_dir . $view_conf->templates);
