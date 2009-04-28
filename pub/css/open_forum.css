@@ -1,12 +1,7 @@
-.msg-container{
-	border:1px solid black;
-	padding-left:10px;
-	width:500px;
-}
-.message{
+ul{
 	list-style-type:none;
 }
-.message .body{
-	border:1px dotted black;
-	padding:10px;
+
+li.body{
+	padding:30px;
 }
