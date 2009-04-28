@@ -21,6 +21,7 @@ class ForumM extends TFModel{
 	 * @see <Model.class.php>
 	 */
 	protected $_actions = array(
+		'new',
 		'open'=>'openForum',
 		'create'=>'addForum',
 		'add-users'=>'addUsers',
@@ -122,6 +123,7 @@ class ForumM extends TFModel{
      * @return bool
      */
     private function doesHavePermission($action,$permission,$log=false){
+    	if ($action=='new') $action = 'create'; 
     	$no_ids = array('create');
     	$globalPermission = (
     		NewDao::getInstance()
@@ -685,6 +687,17 @@ class ForumM extends TFModel{
     	}
 	}
 	
+	/**
+	 * deletes a forum's permission from permission list
+	 * 
+	 * used as a subttute for modifind existing permission
+	 * 
+	 * 	@param int $forum
+	 * 	@param int $perm
+	 * 	@param bool $log
+	 * 
+	 * @access private
+	 */
 	private function deleteForumPermission($forum,$perm,$log=false){
    		NewDao::getInstance()->delete(
    			'forum_actions',
@@ -696,12 +709,22 @@ class ForumM extends TFModel{
    		);
 	}
 	
+	/**
+	 * insertes a new forum permission
+	 * 	@param int $forum
+	 * 	@param int $perm
+	 * 	@param array $options a list of permisssion modes to set
+	 * 	@param bool $log
+	 * @access private
+	 */
 	private function insertForumPermission($forum,$perm,$options=array(),$log=false){
 		if (!is_array($options)) $options=array();
 		$options['forum_id']=$forum;
 		$options['permission_id']=$perm;
 		NewDao::getInstance()->insert('forum_actions',$options,$log);
 	}
+	
+	protected function newForum(){}
 }
 
 class ForumMException extends TFModelException{}

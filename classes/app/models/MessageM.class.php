@@ -585,9 +585,13 @@ class MessageM extends TFModel{
     	NewDao::getInstance()->delete('messages',array('id'=>$id),$dbug);
     }
     
+    /**
+     * retrieves needed information for creating a new message form
+     */
     protected function newMessage(){
     	$this->_base = $this->getOption('base');
     	$this->_parent = $this->getOption('parent');
+    	
     	if (!$this->_parent) $this->_base = true;
     	else{
     		if ($this->doesMessageExists($this->_parent)==false) throw new MessageMException('bad parent id: '.$this->_parent);

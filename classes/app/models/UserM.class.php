@@ -5,6 +5,7 @@ class UserM extends TFModel{
 	 * @see <TFModel.class.php>
 	 */
 	protected $_actions = array(
+		'new'=>'newUser',		
 		'create'=>'createUser',
 		'open'=>'openUser',
 		'login'=>'login',
@@ -111,9 +112,12 @@ class UserM extends TFModel{
 	 */
 	private function doesHavePermission($action,$perm,$log=false){
 		switch($action){
+			case 'new':
+				$action = 'create';
 			case 'create':
 			case 'open':
 				$table = 'user_actions';
+			
 			break;
 			case 'add-permission':
 			case 'remove-permission':
@@ -408,6 +412,39 @@ class UserM extends TFModel{
 	protected function logout(){
 		TFUser::logOut();
 	}
+	
+	protected function newUser(){
+		$userLevel = $this->retrieveUserTopLevel(TFUser::getInstance()->getId(),$this->isDebug());
+		$this->_allowed_permissions = $this->retrieveAllowedPermissions($userLevel,$this->isDebug());
+	}
+	
+	private function retrieveUserTopLevel($id,$log=false){
+		$query = NewDao::getGenerator();
+		$sql = $query->addSelect('permissions',array('level'))
+		->addInnerJoin(array('permissions'=>'id'),array('user_permissions'=>'permission_id'))
+		->addConditionSet(
+			$query->createCondition('permissions','level','>',0),
+			$query->createCondition('user_permissions','user_id','=',$id)
+		)
+		->limit(1)
+		->orderBy('permissions','level')
+		->orderDesc()
+		->generate();
+		$res = NewDao::getInstance()->queryArray($sql,$log);
+		return $res[0]['level'];
+	}
+	
+	private function retrieveAllowedPermissions($level,$log=false){
+		$query = NewDao::getGenerator();
+		$sql = $query->addSelect('permissions',array())
+		->addConditionSet(
+			$query->createCondition('permissions','level','>',0),
+			$query->createCondition('permissions','level','<',$level)
+		)
+		->generate();
+		return NewDao::getInstance()->queryArray($sql,$log);
+	}
+	
 }
 
 class UserMException extends TFModelException {}
