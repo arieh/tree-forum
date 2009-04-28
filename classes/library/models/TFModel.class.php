@@ -91,7 +91,10 @@ abstract class TFModel{
     	}
 		
 		if ($this->getAction()=='') return;
+		if (!in_array($this->getAction(),array_keys($this->_actions))) return;
+		
 		$action_method = $this->_actions[$this->getAction()];
+		
 		$this->$action_method();
 	}
 	
@@ -138,6 +141,8 @@ abstract class TFModel{
 		if ($action && in_array($action,$actions)){
 			$this->_action = $action;
 			return;
+		}elseif (in_array($action,$this->_actions)){
+			$this->_action = $action;
 		}
 		if ($action = $this->getOption('action')){
 			if (in_array($action,$actions)) $this->_action = $action;
