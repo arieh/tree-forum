@@ -413,11 +413,21 @@ class UserM extends TFModel{
 		TFUser::logOut();
 	}
 	
+	/**
+	 * retrieves relevant data for new user form
+	 */
 	protected function newUser(){
 		$userLevel = $this->retrieveUserTopLevel(TFUser::getInstance()->getId(),$this->isDebug());
 		$this->_allowed_permissions = $this->retrieveAllowedPermissions($userLevel,$this->isDebug());
 	}
 	
+	/**
+	 * retrieves a user's top permission level
+	 * 	@param int $id
+	 * 	@param bool $log
+	 * @access private
+	 * @return int
+	 */
 	private function retrieveUserTopLevel($id,$log=false){
 		$query = NewDao::getGenerator();
 		$sql = $query->addSelect('permissions',array('level'))
@@ -431,9 +441,16 @@ class UserM extends TFModel{
 		->orderDesc()
 		->generate();
 		$res = NewDao::getInstance()->queryArray($sql,$log);
-		return $res[0]['level'];
+		return (int)$res[0]['level'];
 	}
 	
+	/**
+	 * returns a list of allowed permissions for a user to set
+	 * 	@param int $level a user's permission level
+	 * 	@param bool $log
+	 * @return array
+	 * @access private
+	 */
 	private function retrieveAllowedPermissions($level,$log=false){
 		$query = NewDao::getGenerator();
 		$sql = $query->addSelect('permissions',array())
