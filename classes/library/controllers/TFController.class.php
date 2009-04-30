@@ -70,7 +70,8 @@ abstract class TFController {
     protected $_output = '';
     
     /**
-     * 	@param array $vars variables passed by router
+     * 	@param array $vars variables passed by router. The first element of the array, 
+     *                     if a string, will be treated as the action.
      * 	@param TFView $view a view instance
      * @access public
      */
@@ -84,17 +85,13 @@ abstract class TFController {
     	$this->_vars = $vars;
     	$this->_view = $view;
     	
-    	$this->setOption('user',TFUser::getInstance()->getId());
-    	$this->setOption('permissions',TFUser::getInstance()->getPermissionIds(false));
-    	if (defined('_DEBUG_')) $this->setOption('debug',_DEBUG_);
-    	
     	$this->setOptions();
     	
     	$this->setModel();
     	
     	$this->executeBefore();
     	
-    	$this->setView();
+    	if ($this->_show_view) $this->setView();
     	
 		$this->executeAfter();
 		
@@ -152,14 +149,7 @@ abstract class TFController {
      * 
      * @access protected
      */
-    protected function setOptions(){
-    	$inputs = array($_GET,$_POST);
-    	foreach ($inputs as $input){
-    		foreach ($input as $key=>$var){
-    			$this->setOption($key,$var);
-    		}
-    	}
-    }
+    protected function setOptions(){}
     
     /**
      * sets the model
@@ -182,8 +172,6 @@ abstract class TFController {
      * @access protected
      */
     protected function setView(){
-    	if (!$this->_show_view) return;
-    	
     	if ($this->_model) $this->_view->assign('model',$this->_model);
     	$this->_view->assign('options',$this->_options);
     	
