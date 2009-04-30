@@ -87,10 +87,9 @@ class keyHandler {
     		//get the last key that was generated for this session
     	$ip = getenv('REMOTE_ADDR');
     	$key  = $this->_dba->getKeyFromDB($ip);
-    	
     		//check if a user exists with this name
     	if ($this->_dba->userExists($name)==false) return false;    	
-    	
+    
     		//retrive the password for the user
     	$pass = $this->_dba->getPass($name);
     	

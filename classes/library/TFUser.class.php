@@ -32,7 +32,7 @@ class TFUser{
      * @static
      */
     static public function isLoggedIn(){
-    	return (self::$_id>1);
+    	return (self::$_instance->getId()>1);
     } 
     
     /**

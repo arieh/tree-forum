@@ -189,7 +189,7 @@ abstract class TFController {
     	
     	if (in_array(TFRouter::getEnv(),$this->_envs)) $folder = TFRouter::getEnv();
 		else $folder = $this->_def_env;
-		
+
 		if (strlen($this->_action)>0){
 			if ( in_array($this->_action,$this->_tpl_folders)) 
 				$location = $this->_template_dir . _SEP_ . $this->_action . _SEP_ . $folder . _SEP_;
