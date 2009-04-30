@@ -13,14 +13,17 @@ abstract class MainController extends TFController{
 	
 	protected function addJS($js=''){
 		if (is_array($js)){
-			$this->_css = array_merge($this->_css,$js);
-		}elseif (is_string($js)) $this->_css[]=$js; 
+			$this->_ss = array_merge($this->_ss,$js);
+		}else{
+			$args = func_get_args();
+			foreach ($args as $arg) if (is_string($arg)) $this->_js[]=$arg;
+		} 
 	}
 	
 	protected function addHeader($header=''){
 		if (is_array($header)){
-			$this->_css = array_merge($this->_css,$header);
-		}elseif (is_string($header)) $this->_css[]=$header; 
+			$this->_headers = array_merge($this->_headers,$header);
+		}elseif (is_string($header)) $this->_headers[]=$header; 
 	}
 	
 	protected function addTitle($title=''){
@@ -30,10 +33,25 @@ abstract class MainController extends TFController{
 	protected function executeBefore(){
 		$this->addTitle('Tree-Forum Example');
 		if (TFRouter::getEnv()=='xhtml'){
+			$this->addJS('mootools-1.2.1-core');
 			$this->_view->assign('css',$this->_css);
 			$this->_view->assign('title',$this->_title);
-			$this->_output .= $this->_view->fetch('header' . DIRECTORY_SEPARATOR . 'xhtml' . DIRECTORY_SEPARATOR . 'main.tpl.php');		
+			
+			$this->_output .= $this->_view->fetch('header' . DIRECTORY_SEPARATOR . 'xhtml' . DIRECTORY_SEPARATOR . 'main.tpl.php');
+			
+			if (TFUser::isLoggedIn()==false){
+				$this->addJS('loginForm','sha1');
+				
+				$userM = new UserM();
+				$userM->execute();
+				$this->_view->assign('key',$userM->getKey());
+				$this->_output .= $this->_view->fetch('header'. DIRECTORY_SEPARATOR . 'xhtml' . DIRECTORY_SEPARATOR . 'menu' .DIRECTORY_SEPARATOR. 'login-form.tpl.php');
+			}else{
+				$this->_output .= $this->_view->fetch('header'. DIRECTORY_SEPARATOR . 'xhtml' . DIRECTORY_SEPARATOR . 'menu' .DIRECTORY_SEPARATOR . 'main.tpl.php');
+			}
+					
 		}
+		
 	}
 	
 	protected function executeAfter(){

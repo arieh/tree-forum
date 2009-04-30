@@ -5,7 +5,7 @@ while ($msg = $this->model->getMessage()):?>
 	<h3><a href='<?php echo $this->bPath;?>message/view/<?php echo $msg->getId();?>'>
 		<?php echo $msg->getTitle();?></a></h3>
 		<ul class='message'>
-			<li>User: <?php echo $msg->getUserName();?></li>
+			<li>User: <a href="<?php echo $this->bPath;?>user/open/<?php echo $msg->getUserId();?>"><?php echo $msg->getUserName();?></a></li>
 			<li>On <?php echo $msg->getTime();?></li>
 			<li class='body'><?php echo $msg->getMessage();?></li>
 			<li>

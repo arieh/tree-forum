@@ -42,6 +42,7 @@ function setEncryption(){
 	var string  = encPass+ename+key; //joining the key, the password and the user name
 	var sha     = hex_sha1(string); //hashing them
 	var enc     = hex_sha1(sha);    //re-hashing the password
+
 	//******************
 	var length  = pass.length;
 	document.getElementById('pass').value=encPass.substr(0,length);

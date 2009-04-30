@@ -138,17 +138,16 @@ class UserM extends TFModel{
 		$pass = $this->getOption('password');
 		$this->_email = $email = $this->getOption('email');
 		$encrypt = ($this->isOptionSet('encrypt')) ? $this->getOption('encrypt') : true;
-
-		if (count($permissions)<1) $this->setError('no-permissions');
+		
+		if (!is_array($permissions) || count($permissions)<1) $this->setError('no-permissions');
+		else foreach ($permissions as $permission) if ($this->doesPermissionExists($permission)==false) throw new UserMException('badPermission'); 
+		
 		if (strlen($name)<2) $this->setError('noName');
 		if ($this->isNameTaken($name,$dbug)) $this->setError('nameTaken');
 		if (!is_string($pass)) $this->setError('badPass');
 		if ($this->isValidEmail($email)==false) $this->setError('badEmail');
-		
-		foreach ($permissions as $permission) if ($this->doesPermissionExists($permission)==false) throw new UserMException('badPermission');
-		
+
 		if ($this->isError()) return false;
-		
 		if ($encrypt) $pass = sha1($pass);
 		
 		$uid = $this->generateUid();
@@ -257,6 +256,7 @@ class UserM extends TFModel{
 	protected function openUser(){
 		$dbug = $this->isDebug();
 		$this->_id = $id = $this->getOption('id');
+		
 		if (!$id){
 			$name = $this->_name = $this->getOption('name');
 			if (!$name) $this->setError('noId');
@@ -393,6 +393,7 @@ class UserM extends TFModel{
 		if (!is_string($name) || strlen($name)<2 || $this->doesUserExists($name,$this->isDebug())==false) $this->setError('badName');
 		
 		$hash  = $this->getOption('hash');
+		
 		if (!is_string($hash) || strlen($hash)<40) $this->setError('badHash');
 		
 		$encoded = ($this->isOptionSet('encoded')) ? (bool)$this->getOption('encoded') : true;
