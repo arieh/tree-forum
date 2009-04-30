@@ -161,7 +161,7 @@ abstract class TFController {
     	if (strlen($name)==0) return;
     	
     	if (!is_subclass_of($name,'TFModel')) throw new TFControllerException('model must be a subclass of TFModel');
-    	
+
     	$this->_model = new $name($this->getOptions());
 		
 		$this->_model->execute();	

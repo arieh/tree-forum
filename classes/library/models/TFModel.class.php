@@ -13,7 +13,7 @@ abstract class TFModel{
 	 * @access private
 	 * @static
 	 */
-	static private $_TF_MODEL_VERSION = '0.6';
+	static private $_TF_MODEL_VERSION = '0.6.2';
 	
 	/**
 	 * @var array holder of paramater options
@@ -91,7 +91,7 @@ abstract class TFModel{
     	}
 		
 		if ($this->getAction()=='') return;
-		if (!in_array($this->getAction(),array_keys($this->_actions))) return;
+		if (!array_key_exists($this->getAction(),$this->_actions)) return;
 		
 		$action_method = $this->_actions[$this->getAction()];
 		
