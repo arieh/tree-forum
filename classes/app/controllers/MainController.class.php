@@ -62,6 +62,21 @@ abstract class MainController extends TFController{
 		
 		foreach ($this->_headers as $header) header($header);
 	}
+	
+	protected function setOptions(){
+		parent::setOptions();
+		
+		$this->setOption('user',TFUser::getInstance()->getId());
+    	$this->setOption('permissions',TFUser::getInstance()->getPermissionIds(false));
+    	if (defined('_DEBUG_')) $this->setOption('debug',_DEBUG_);
+		
+		$inputs = array($_GET,$_POST);
+    	foreach ($inputs as $input){
+    		foreach ($input as $key=>$var){
+    			$this->setOption($key,$var);
+    		}
+    	}
+	}
 }
 
 class MainControllerException extends TFControllerException{}
