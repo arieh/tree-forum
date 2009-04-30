@@ -34,6 +34,10 @@ class ForumC extends MainController{
 				$this->setOption('start',$start);
 				$this->setOption('limit',$limit);
 			break;
+			case 'close':
+    			$this->setOption('close',true);
+    			$this->setOption('action','restrict');
+    		break;
 		} 
 		
 		parent::setOptions();
@@ -50,6 +54,11 @@ class ForumC extends MainController{
     			$this->addTitle('add');
     			$this->addCSS('create_forum');
     			$this->addJS('create_forum');
+    		break;
+    		case 'restrict':
+    		case 'close':
+    		case 'free':
+    			$this->_show_view = false;
     		break;
     	}
     	

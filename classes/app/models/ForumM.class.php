@@ -124,6 +124,7 @@ class ForumM extends TFModel{
      */
     private function doesHavePermission($action,$permission,$log=false){
     	if ($action=='new') $action = 'create'; 
+    	if ($action='close') $action='restrict';
     	$no_ids = array('create');
     	$globalPermission = (
     		NewDao::getInstance()
@@ -626,6 +627,39 @@ class ForumM extends TFModel{
 		
 		$this->_name = $res['name'];
 		$this->_desc = $res['description'];
+		$this->_restricted = $this->isForumRestricted($log);
+		$this->_closed = $this->isForumClosed($log);
+		$this->_admin = $this->retrieveAdminId($log);
+	}
+
+	private function retrieveAdminId($log=false){
+		$query = NewDao::getGenerator();
+		$sql = $query->addSelect('users',array('id'))
+		->addInnerJoin(array('users'=>'id'),array('user_permissions'=>'user_id'))
+		->addInnerJoin(array('user_permissions'=>'permission_id'),array('permissions'=>'id'))
+		->addConditionSet(
+			$query->createCondition('permissions','name','=',strtolower($this->getName()) . '-admin','LCASE')
+		)
+		->limit(1)
+		->generate();
+		$res = NewDao::getInstance()->queryArray($sql,$log);
+		return (int)$res[0]['id'];		
+	}
+	
+	private function isForumRestricted($log=false){
+		return (
+			NewDao::getInstance()
+			->countFields('forum_actions',array('forum_id'=>$this->getId(),'open'=>0,'permission_id'=>8),$log)
+			>0
+		);
+	}
+	
+	private function isForumClosed($log=false){
+		return (
+			NewDao::getInstance()
+			->countFields('forum_actions',array('forum_id'=>$this->getId(),'open'=>0,'permission_id'=>8),$log)
+			>0
+		);
 	}
 
 	/**
@@ -663,12 +697,11 @@ class ForumM extends TFModel{
 	 */
 	protected function freeForum(){
 		$this->validateForumId();
-  		
   		if ($this->isError()) return;
   		
   		$id = $this->getId();
   		
-  		$this->setFree($id);
+  		$this->setFree($id,$this->isDebug());
 	}
 	
 	/**
