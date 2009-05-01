@@ -16,8 +16,10 @@ class MessageC extends MainController{
     protected $_def_env = 'xhtml';
     
     protected function setOptions(){
-    	if (isset($this->_vars[0]) && is_numeric($this->_vars[0])){
-			$this->setOption('id',array_shift($this->_vars));
+    	if (isset($this->_vars[0]) ){
+    		if (is_numeric($this->_vars[0])){
+				$this->setOption('id',array_shift($this->_vars));
+    		}elseif (is_string($this->_vars[0])) $this->setOption('name',array_shift($this->_vars));	
 		}
 		
 		switch ($this->_action){

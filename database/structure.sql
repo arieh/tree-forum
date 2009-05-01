@@ -30,6 +30,7 @@ CREATE TABLE `forums` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `description` varchar(255) NOT NULL,
   `name` varchar(45) NOT NULL,
+  `url-name` varchar(255) default NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `message_id` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
@@ -59,6 +60,7 @@ CREATE TABLE `messages` (
   `posted` timestamp NULL default NULL,
   `user_id` int(11) default '0',
   `last_update` timestamp NULL default NULL on update CURRENT_TIMESTAMP,
+  `name` varchar(255) collate utf8_bin default NULL,
   PRIMARY KEY  (`id`,`dna`),
   UNIQUE KEY `id` (`id`),
   KEY `forum_id` (`forum_id`),

@@ -98,8 +98,17 @@ class ForumM extends TFModel{
     	$action = $this->getAction();
     	
     	if ($action=='open') {
-    		$this->_id = $id = $this->getOption('id');
-    		if (!$id || !is_numeric($id) || !$this->doesForumExists($id,true)) throw new ForumMException('forum id is invalid');
+    		$id = $this->_id =0;
+	  		if (!$this->isOptionSet('id')){
+	  			if ($this->isOptionSet('name')){
+					$name = strtolower($this->getOption('name'));
+					if ($this->doesNameExists($name,$this->isDebug())) 
+						$id = $this->_id = $this->retrieveForumId($name,$this->isDebug());
+	  			}else{
+	  				$this->setError('noId');
+	  				return;	
+	  			}  			
+	  		}else $this->_id = $id = $this->getOption('id');
     	}
     	
     	if ($this->isError()){
@@ -124,7 +133,6 @@ class ForumM extends TFModel{
      */
     private function doesHavePermission($action,$permission,$log=false){
     	if ($action=='new') $action = 'create'; 
-    	if ($action='close') $action='restrict';
     	$no_ids = array('create');
     	$globalPermission = (
     		NewDao::getInstance()
@@ -204,13 +212,32 @@ class ForumM extends TFModel{
   		
   		$id = $this->_id =0;
   		if (!$this->isOptionSet('id')){
-  			$this->setError('noId');
-  			return;
+  			if ($this->isOptionSet('name')){
+				$name = strtolower($this->getOption('name'));
+				if ($this->doesNameExists($name,$this->isDebug())) 
+					$id = $this->_id = $this->retrieveForumId($name,$this->isDebug());
+  			}else{
+  				$this->setError('noId');
+  				return;	
+  			}  			
   		}else $this->_id = $id = $this->getOption('id');
+		
   		if (!$this->doesForumExists($id,false)){
   			throw new ForumMException('supplied forum id ('.$id.') is invalid');
   		}
   		$this->_id = $id;
+  	}
+  	
+  	private function doesNameExists($name,$log=false){
+  		return (
+  			NewDao::getInstance()
+  			->countFieldsLCASE('forums',array('url-name'=>$name),$log)>0
+  		);
+  	}
+  	
+  	private function retrieveForumId($name,$log=false){
+  		$res = NewDao::getInstance()->selectLCASE('forums',array('id'),array('url-name'=>$name),false,$log);
+  		return $res[0]['id'];
   	}
   	
   	/**
@@ -362,7 +389,6 @@ class ForumM extends TFModel{
     	if ($closed)   $this->setRestricted($this->getId(),true,$dbug);
     	elseif ($restrict) $this->setRestricted($this->getId(),false,$dbug);
     	
-    	
     	$perms = $this->getOption('forum-permissions');
     	
     	if (is_array($perms) && count($perms)>0){
@@ -379,7 +405,8 @@ class ForumM extends TFModel{
      * @access private
      */
     private function createForum($name,$desc,$log=false){
-    	$this->_id = NewDao::getInstance()->insert('forums',array('name'=>$name,'description'=>$desc),$log);
+    	$url_name = str_replace(" ","-",strtolower(misc::strip_symbols($name)));
+    	$this->_id = NewDao::getInstance()->insert('forums',array('name'=>$name,'description'=>$desc,'url-name'=>$url_name),$log);
     }
     
     /**
@@ -627,39 +654,6 @@ class ForumM extends TFModel{
 		
 		$this->_name = $res['name'];
 		$this->_desc = $res['description'];
-		$this->_restricted = $this->isForumRestricted($log);
-		$this->_closed = $this->isForumClosed($log);
-		$this->_admin = $this->retrieveAdminId($log);
-	}
-
-	private function retrieveAdminId($log=false){
-		$query = NewDao::getGenerator();
-		$sql = $query->addSelect('users',array('id'))
-		->addInnerJoin(array('users'=>'id'),array('user_permissions'=>'user_id'))
-		->addInnerJoin(array('user_permissions'=>'permission_id'),array('permissions'=>'id'))
-		->addConditionSet(
-			$query->createCondition('permissions','name','=',strtolower($this->getName()) . '-admin','LCASE')
-		)
-		->limit(1)
-		->generate();
-		$res = NewDao::getInstance()->queryArray($sql,$log);
-		return (int)$res[0]['id'];		
-	}
-	
-	private function isForumRestricted($log=false){
-		return (
-			NewDao::getInstance()
-			->countFields('forum_actions',array('forum_id'=>$this->getId(),'open'=>0,'permission_id'=>8),$log)
-			>0
-		);
-	}
-	
-	private function isForumClosed($log=false){
-		return (
-			NewDao::getInstance()
-			->countFields('forum_actions',array('forum_id'=>$this->getId(),'open'=>0,'permission_id'=>8),$log)
-			>0
-		);
 	}
 
 	/**
@@ -697,11 +691,12 @@ class ForumM extends TFModel{
 	 */
 	protected function freeForum(){
 		$this->validateForumId();
+  		
   		if ($this->isError()) return;
   		
   		$id = $this->getId();
   		
-  		$this->setFree($id,$this->isDebug());
+  		$this->setFree($id);
 	}
 	
 	/**

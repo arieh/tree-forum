@@ -108,5 +108,15 @@ class misc {
 	  // Return the resulting array
 	  return $array;
 	}
-		
+	
+	static function strip_chars(){
+		$args = func_get_args();
+		$str = array_shift($args);
+		foreach ($args as $char) $str = str_replace($char,'',$str);
+		return $str;		
+	}
+	
+	static function strip_symboles($str){
+		return preg_replace("/[^\w\s\d]/", "", $str);
+	}	
 }

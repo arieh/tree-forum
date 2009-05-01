@@ -183,17 +183,23 @@ class MessageM extends TFModel{
 		$action = $this->getAction();
     	
     	switch ($action){
-    		case 'view':
     		case 'edit':
     		case 'remove':
+			case 'view':
+				if ($this->isOptionSet('name')){
+					$this->_name = $name = strtolower($this->getOption('name'));
+					if ($this->doesMessageExists($name,false,$this->isDebug())){
+						$id = $this->_id = $this->retrieveMessageId($name,$this->isDebug());
+					}
+				}
     		case 'move':
-    			$this->_id = $id = $this->getOption('id');
+				if (!isset($id)) $this->_id = $id = $this->getOption('id');
+				
+				if (!$id || !is_numeric($id)) throw new MessageMException('badId');
+    			
     			$forum = $this->_forum_id = $this->retrieveForumId($id,false);
-    			if (!$id) $id = $this->getOption('id');
-    			if (!$id || !is_numeric($id)) throw new MessageMException('badId');
+
     			if (!$this->doesMessageExists($id,$forum)) throw new MessageMException('badId');
-    			
-    			
     		break;
     		case 'add':
     		case 'new':
@@ -204,6 +210,11 @@ class MessageM extends TFModel{
     			$this->_forum_id = $forum_id;
     		break;
     	}
+	}
+	
+	private function retrieveMessageId($name,$log=false){
+		$res = NewDao::getInstance()->selectLCASE('messages',array('id'),array('name'=>$name),false,$log);
+		return $res[0]['id'];
 	}
 	
 	/**
@@ -241,7 +252,7 @@ class MessageM extends TFModel{
 			$title = $this->getOption('title');
 			$message = $this->getOption('message');
 			$user = $this->getOption('user');
-			fb($user);
+
 			if (!$title || !is_string($title) || strlen($title)<2) $this->setError('shortTitle');
 			if (!$message || !is_string($message) || strlen($message)<2) $this->setError('shortContent');
 			
@@ -274,6 +285,12 @@ class MessageM extends TFModel{
 	 * @return bool
 	 */
 	private function doesMessageExists($id,$forum=false,$log=false){
+		if (!is_numeric($id) && is_string($id)){
+			return (
+				NewDao::getInstance()
+				->countFieldsLCASE('messages',array('name'=>$id),$log)>0
+			);
+		}
 		if ($forum) return (NewDao::getInstance()->countFields('messages',array('forum_id'=>$forum,'id'=>$id),$log)>0);
 		return (NewDao::getInstance()->countFields('messages',array('id'=>$id),$log)>0);
 	}
@@ -287,6 +304,9 @@ class MessageM extends TFModel{
 	 * @access private
 	 */
 	private function postBaseMessage($forum,$title,$message,$user=0,$log=false){
+		
+		$name = str_replace(' ','-',misc::strip_symbols(strtolower($name)));
+		
 		NewDao::getInstance()->insert(
 			'messages',
 			array(
@@ -294,7 +314,8 @@ class MessageM extends TFModel{
 				'base'=>1,
 				'posted'=>'NOW()',
 				'last_update'=>'NOW()',
-				'user_id'=>$user
+				'user_id'=>$user,
+				'name'=>$name
 				),
 			$log
 		);
