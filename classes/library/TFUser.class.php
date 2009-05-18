@@ -5,6 +5,12 @@
 class TFUser{
 	
 	/**
+	 * @param int default user id
+	 * @constant
+	 */
+	const DEF_ID = 1;
+	
+	/**
 	 * @param TFUser a sigelton for the user
 	 * @access private
 	 * @static
@@ -80,10 +86,18 @@ class TFUser{
     		session_regenerate_id();
     	}
     	
-    	if (isset($_SESSION['TFUser']) && is_numeric($_SESSION['TFUser'])){
-    		self::$_id = $_SESSION['TFUser'];
+    	if (isset($_SESSION['TFUser'])){
+			TreeForumAutoload('TFUserM');
+			if ($_SESSION['TFUser'] instanceof TFUserM){
+				self::$_instance = $_SESSION['TFUser'];
+				self::$_id = self::$_instance->getId();
+			}else{
+				self::$_id = self::DEF_ID;
+			}			
+    	}else{
+    		 self::$_id = self::DEF_ID;
+    		 self::regenerate();
     	}
-		self::regenerate();
     	
     	return self::$_instance;
     }
@@ -111,8 +125,7 @@ class TFUser{
      * @static
      */
     static public function regenerate(){
-    	self::$_instance =  new TFUserM(array('id'=>self::$_id,'debug'=>self::isDebug()));
-    	$_SESSION['TFUser'] = self::$_id;
+    	$_SESSION['TFUser'] = self::$_instance = new TFUserM(array('id'=>self::$_id,'debug'=>self::isDebug()));
     }
 }
 
